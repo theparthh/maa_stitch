@@ -24,7 +24,7 @@ class ViewerToolbarWidget extends StatelessWidget {
         border: const Border(bottom: BorderSide(color: AppColors.border)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.06),
+            color: AppColors.primary.withValues(alpha: 0.05),
             blurRadius: AppSize.size8,
             offset: const Offset(0, 2),
           ),
@@ -36,7 +36,7 @@ class ViewerToolbarWidget extends StatelessWidget {
           children: [
             IconButton(
               onPressed: onBackTap,
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.primary),
             ),
             AppGaps.gap8,
             Expanded(
@@ -61,7 +61,7 @@ class ViewerToolbarWidget extends StatelessWidget {
                           vertical: AppSize.size2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.secondary,
+                          color: AppColors.primary,
                           borderRadius: AppBorderRadius.borderRadius4,
                         ),
                         child: Text(

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:maa_design_stitch_viewer/app/core/helpers/connectivity_helper.dart';
 import 'package:maa_design_stitch_viewer/features/auth/domain/domain.dart';
 
 part 'otp_verification_event.dart';
@@ -78,13 +79,26 @@ class OtpVerificationBloc
     OtpSubmitted event,
     Emitter<OtpVerificationState> emit,
   ) async {
-    if (event.otp.length != 4) {
+    if (event.otp.length != 6) {
       emit(
         OtpVerificationFailure(
           otp: event.otp,
-          errorMessage: 'Please enter a complete 4-digit OTP code',
+          errorMessage: 'Please enter a complete 6-digit OTP code',
           timerSeconds: state.timerSeconds,
           canResend: state.canResend,
+        ),
+      );
+      return;
+    }
+
+    final isOnline = await ConnectivityHelper.checkIsOnline();
+    if (!isOnline) {
+      emit(
+        OtpVerificationFailure(
+          otp: event.otp,
+          errorMessage: 'No internet connection. Please check your network and try again.',
+          timerSeconds: state.timerSeconds,
+          canResend: state.timerSeconds <= 0,
         ),
       );
       return;
@@ -97,40 +111,30 @@ class OtpVerificationBloc
       ),
     );
 
-    try {
-      final result = await repository.verifyOtp(
-        phoneNumber: event.phoneNumber,
-        otp: event.otp,
-      );
+    final result = await repository.verifyOtp(
+      phoneNumber: event.phoneNumber,
+      otp: event.otp,
+    );
 
-      if (result.success) {
+    result.fold(
+      (failure) => emit(
+        OtpVerificationFailure(
+          otp: event.otp,
+          errorMessage: failure.message,
+          timerSeconds: state.timerSeconds,
+          canResend: state.timerSeconds <= 0,
+        ),
+      ),
+      (authResult) {
         _timer?.cancel();
         emit(
           OtpVerificationSuccess(
             otp: event.otp,
-            authResult: result,
+            authResult: authResult,
           ),
         );
-      } else {
-        emit(
-          OtpVerificationFailure(
-            otp: event.otp,
-            errorMessage: result.errorMessage ?? 'Invalid OTP code',
-            timerSeconds: state.timerSeconds,
-            canResend: state.timerSeconds <= 0,
-          ),
-        );
-      }
-    } catch (e) {
-      emit(
-        OtpVerificationFailure(
-          otp: event.otp,
-          errorMessage: e.toString().replaceAll('Exception: ', ''),
-          timerSeconds: state.timerSeconds,
-          canResend: state.timerSeconds <= 0,
-        ),
-      );
-    }
+      },
+    );
   }
 
   Future<void> _onResendRequested(
@@ -148,27 +152,26 @@ class OtpVerificationBloc
     );
     _startTimer();
 
-    try {
-      await repository.sendOtp(
-        countryCode: '',
-        phoneNumber: event.phoneNumber,
-      );
-      emit(
+    final result = await repository.resendOtp(
+      phoneNumber: event.phoneNumber,
+    );
+
+    result.fold(
+      (failure) => emit(
+        OtpVerificationFailure(
+          otp: '',
+          errorMessage: failure.message,
+          timerSeconds: state.timerSeconds,
+          canResend: true,
+        ),
+      ),
+      (_) => emit(
         const OtpResentSuccess(
           otp: '',
           timerSeconds: _initialTimerSeconds,
         ),
-      );
-    } catch (e) {
-      emit(
-        OtpVerificationFailure(
-          otp: '',
-          errorMessage: 'Failed to resend OTP. Please try again.',
-          timerSeconds: state.timerSeconds,
-          canResend: true,
-        ),
-      );
-    }
+      ),
+    );
   }
 
   @override

@@ -1,57 +1,76 @@
-# Phone Authentication & OTP Verification Feature
+# Auth Feature
 
-This feature handles user authentication via mobile phone number entry with country selection and 4-digit OTP verification using `pinput`. It features real-time phone validation, interactive resend timer, error shake animations, Hero transitions, and shimmer skeleton loading states.
+The Auth feature manages mobile OTP-based authentication for the Maa Stitch Viewer application. It allows users to enter a 10-digit mobile number, receive a 4-digit verification code via REST API, and verify the OTP to access the application.
 
 ## What lives here
 
-- `PhoneLoginScreen` — Phone entry screen with country code picker and format validation.
-- `OtpVerificationScreen` — 4-digit pin entry screen powered by `Pinput` with resend countdown timer.
-- `PhoneLoginBloc` & `OtpVerificationBloc` — BLoC state management for input handling and verification flow.
-- `AuthRepository` & `AuthRepositoryImpl` — Clean architecture domain interface and data provider.
+- **PhoneLoginScreen**: Entry screen for mobile number input and OTP request.
+- **OtpVerificationScreen**: OTP verification screen with resend timer and custom 4-digit input.
+- **PhoneLoginBloc**: Manages state for mobile input validation and OTP dispatch.
+- **OtpVerificationBloc**: Manages state for OTP input, validation, resend timer, and verification.
+- **AuthRepository**: Interface for authenticating with the Maa Embroidery backend APIs.
 
 ## Files
 
-- `lib/features/auth/auth.dart` — Feature barrel export.
-- `lib/features/auth/domain/` — `AuthRepository`, `CountryCodeModel`, `AuthResultModel`.
-- `lib/features/auth/data/` — `AuthRepositoryImpl`.
-- `lib/features/auth/presentation/bloc/` — `PhoneLoginBloc`, `OtpVerificationBloc`.
-- `lib/features/auth/presentation/screens/` — `PhoneLoginScreen`, `OtpVerificationScreen`.
-- `lib/features/auth/presentation/widgets/` — `PhoneInputFieldWidget`, `OtpPinInputWidget`, `OtpTimerResendWidget`, `PhoneLoginShimmerWidget`, `OtpVerificationShimmerWidget`, etc.
+- `lib/features/auth/domain/repositories/auth_repository.dart`
+- `lib/features/auth/data/repositories/auth_repository_impl.dart`
+- `lib/features/auth/presentation/bloc/phone_login/phone_login_bloc.dart`
+- `lib/features/auth/presentation/bloc/otp_verification/otp_verification_bloc.dart`
+- `lib/features/auth/presentation/screens/phone_login_screen.dart`
+- `lib/features/auth/presentation/screens/otp_verification_screen.dart`
+- `lib/features/auth/presentation/widgets/phone_input_field_widget.dart`
+- `lib/features/auth/presentation/widgets/otp_pin_input_widget.dart`
 
 ## Flow chart
 
 ### User & Data Flow (ASCII)
 
 ```
-┌────────────────────┐
-│ PhoneLoginScreen   │
-└─────────┬──────────┘
-          │ (Submit 10-digit number)
-          ▼
-┌────────────────────┐      (Success)      ┌─────────────────────────┐
-│  PhoneLoginBloc    ├────────────────────►│ OtpVerificationScreen   │
-└────────────────────┘                     └────────────┬────────────┘
-                                                        │ (Submit 4-digit OTP)
-                                                        ▼
-                                           ┌─────────────────────────┐
-                                           │ OtpVerificationBloc     │
-                                           └────────────┬────────────┘
-                                                        │ (Auth Token)
-                                                        ▼
-                                           ┌─────────────────────────┐
-                                           │ HomeScreen (Main App)   │
-                                           └─────────────────────────┘
+┌──────────────────┐
+│ PhoneLoginScreen │
+└────────┬─────────┘
+         │ (Mobile Input)
+         ▼
+┌──────────────────┐
+│  PhoneLoginBloc  │
+└────────┬─────────┘
+         │ (sendOtp)
+         ▼
+┌──────────────────┐      POST /api/login      ┌──────────────────────────┐
+│  AuthRepository  │ ────────────────────────> │  Maa Embroidery Backend  │
+└────────┬─────────┘ (app_source: stitch)      └──────────────────────────┘
+         │ (Success)
+         ▼
+┌───────────────────────┐
+│ OtpVerificationScreen │
+└────────┬──────────────┘
+         │ (4-Digit OTP)
+         ▼
+┌───────────────────────┐
+│ OtpVerificationBloc   │
+└────────┬──────────────┘
+         │ (verifyOtp)
+         ▼
+┌──────────────────┐    POST /api/verify-otp   ┌──────────────────────────┐
+│  AuthRepository  │ ────────────────────────> │  Maa Embroidery Backend  │
+└────────┬─────────┘ (app_source: stitch)      └──────────────────────────┘
+         │ (Success - JWT Token)
+         ▼
+┌──────────────────┐
+│    HomeScreen    │
+└──────────────────┘
 ```
 
 ### Flow Chart (Mermaid)
 
 ```mermaid
 flowchart TD
-    A[PhoneLoginScreen] -->|PhoneLoginNumberChanged| B[PhoneLoginBloc]
-    B -->|PhoneLoginSubmitted| C[AuthRepository.sendOtp]
-    C -->|Success| D[OtpVerificationScreen]
-    D -->|OtpInputChanged| E[OtpVerificationBloc]
-    E -->|OtpSubmitted| F[AuthRepository.verifyOtp]
-    F -->|AuthResult Success| G[HomeScreen]
-    F -->|Failure| H[Error Shake & Alert]
+    A[PhoneLoginScreen] -->|Mobile 10 digits| B[PhoneLoginBloc]
+    B -->|sendOtp| C[AuthRepository]
+    C -->|POST /api/login| D[(Maa Backend API)]
+    D -->|OTP Sent| E[OtpVerificationScreen]
+    E -->|OTP Input| F[OtpVerificationBloc]
+    F -->|verifyOtp| C
+    C -->|POST /api/verify-otp| D
+    D -->|JWT Auth Token| G[HomeScreen]
 ```

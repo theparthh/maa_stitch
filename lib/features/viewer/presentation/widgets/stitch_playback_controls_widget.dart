@@ -28,8 +28,15 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSize.size16, vertical: AppSize.size8),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.95),
+        color: AppColors.surface.withValues(alpha: 0.98),
         border: const Border(top: BorderSide(color: AppColors.border)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.04),
+            blurRadius: AppSize.size12,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -40,7 +47,7 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
                 onPressed: onPlayToggle,
                 icon: Icon(
                   isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_fill_rounded,
-                  color: AppColors.secondary,
+                  color: AppColors.primary,
                   size: AppSize.size36,
                 ),
               ),
@@ -48,10 +55,10 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
               Expanded(
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: AppColors.secondary,
+                    activeTrackColor: AppColors.primary,
                     inactiveTrackColor: AppColors.border,
-                    thumbColor: AppColors.secondary,
-                    overlayColor: AppColors.secondary.withValues(alpha: 0.2),
+                    thumbColor: AppColors.primary,
+                    overlayColor: AppColors.primary.withValues(alpha: 0.15),
                     trackHeight: AppSize.size4,
                   ),
                   child: Slider(
@@ -79,14 +86,14 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: AppSize.size8, vertical: AppSize.size4),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: AppColors.primaryLight,
                     borderRadius: AppBorderRadius.borderRadius8,
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                   ),
                   child: Text(
                     '${speed.toStringAsFixed(0)}x',
                     style: AppTextStyles.caption.copyWith(
-                      color: AppColors.secondary,
+                      color: AppColors.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

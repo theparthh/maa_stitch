@@ -24,7 +24,7 @@ class ThreadPaletteBarWidget extends StatelessWidget {
       height: AppSize.size56,
       padding: const EdgeInsets.symmetric(horizontal: AppSize.size16, vertical: AppSize.size8),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.92),
+        color: AppColors.surface.withValues(alpha: 0.98),
         border: const Border(top: BorderSide(color: AppColors.border)),
       ),
       child: Row(
@@ -34,10 +34,10 @@ class ThreadPaletteBarWidget extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: AppSize.size10, vertical: AppSize.size6),
               decoration: BoxDecoration(
-                color: selectedColorIndex == null ? AppColors.secondary : AppColors.surfaceLight,
+                color: selectedColorIndex == null ? AppColors.primary : AppColors.surfaceLight,
                 borderRadius: AppBorderRadius.borderRadius12,
                 border: Border.all(
-                  color: selectedColorIndex == null ? AppColors.secondary : AppColors.border,
+                  color: selectedColorIndex == null ? AppColors.primary : AppColors.border,
                 ),
               ),
               child: Text(
@@ -67,7 +67,7 @@ class ThreadPaletteBarWidget extends StatelessWidget {
                       color: color,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isSelected ? AppColors.textPrimary : AppColors.border,
+                        color: isSelected ? AppColors.primary : AppColors.border,
                         width: isSelected ? AppSize.size3 : AppSize.size1,
                       ),
                       boxShadow: isSelected
@@ -81,10 +81,10 @@ class ThreadPaletteBarWidget extends StatelessWidget {
                           : null,
                     ),
                     child: isSelected
-                        ? Icon(
+                        ? const Icon(
                             Icons.check_rounded,
                             size: AppSize.size18,
-                            color: AppColors.black,
+                            color: AppColors.white,
                           )
                         : Center(
                             child: Text(

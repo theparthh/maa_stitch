@@ -72,34 +72,34 @@ class _OtpVerificationShimmerWidgetState
     return Column(
       children: [
         _buildShimmerBox(
-          width: AppSize.size80,
-          height: AppSize.size80,
-          borderRadius: AppBorderRadius.borderRadius24,
+          width: AppSize.size64,
+          height: AppSize.size64,
+          borderRadius: AppBorderRadius.borderRadius20,
         ),
+        AppGaps.gap16,
+        _buildShimmerBox(width: AppSize.size180, height: AppSize.size24),
+        AppGaps.gap8,
+        _buildShimmerBox(width: AppSize.size220, height: AppSize.size14),
         AppGaps.gap24,
-        _buildShimmerBox(width: AppSize.size200, height: AppSize.size32),
-        AppGaps.gap12,
-        _buildShimmerBox(width: AppSize.size240, height: AppSize.size16),
-        AppGaps.gap32,
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
-            4,
+            6,
             (index) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSize.size8),
+              padding: const EdgeInsets.symmetric(horizontal: AppSize.size4),
               child: _buildShimmerBox(
-                width: AppSize.size64,
-                height: AppSize.size64,
-                borderRadius: AppBorderRadius.borderRadius16,
+                width: AppSize.size44,
+                height: AppSize.size50,
+                borderRadius: AppBorderRadius.borderRadius12,
               ),
             ),
           ),
         ),
-        AppGaps.gap32,
+        AppGaps.gap24,
         _buildShimmerBox(
           width: double.infinity,
-          height: AppSize.size56,
-          borderRadius: AppBorderRadius.borderRadius16,
+          height: AppSize.size50,
+          borderRadius: AppBorderRadius.borderRadius14,
         ),
       ],
     );

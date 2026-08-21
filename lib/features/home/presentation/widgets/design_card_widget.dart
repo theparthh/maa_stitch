@@ -15,11 +15,11 @@ class DesignCardWidget extends StatelessWidget {
   Color _getBadgeColor(String ext) {
     switch (ext.toLowerCase()) {
       case 'dst':
-        return AppColors.secondary;
+        return AppColors.primary;
       case 'emb':
-        return AppColors.blue;
+        return AppColors.secondary;
       case 'dhp':
-        return Colors.amber;
+        return AppColors.blueLight;
       default:
         return AppColors.grey;
     }

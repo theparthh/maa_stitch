@@ -15,14 +15,6 @@ final class PhoneLoginNumberChanged extends PhoneLoginEvent {
   List<Object?> get props => [phoneNumber];
 }
 
-final class PhoneLoginCountryCodeChanged extends PhoneLoginEvent {
-  const PhoneLoginCountryCodeChanged(this.countryCode);
-  final CountryCodeModel countryCode;
-
-  @override
-  List<Object?> get props => [countryCode];
-}
-
 final class PhoneLoginSubmitted extends PhoneLoginEvent {
   const PhoneLoginSubmitted();
 }

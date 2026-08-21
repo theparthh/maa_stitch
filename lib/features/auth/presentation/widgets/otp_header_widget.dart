@@ -18,62 +18,81 @@ class OtpHeaderWidget extends StatelessWidget {
         Hero(
           tag: 'auth_brand_icon',
           child: Container(
-            width: AppSize.size80,
-            height: AppSize.size80,
+            width: AppSize.size72,
+            height: AppSize.size72,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: AppBorderRadius.borderRadius24,
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.15),
-                width: AppSize.size1_5,
+              gradient: const LinearGradient(
+                colors: [AppColors.primary, AppColors.secondary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              borderRadius: AppBorderRadius.borderRadius24,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.primary.withValues(alpha: 0.25),
                   blurRadius: AppSize.size20,
-                  offset: const Offset(0, AppSize.size8),
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.mark_email_read_rounded,
-              size: AppSize.size40,
-              color: AppColors.primary,
+            child: const Center(
+              child: Icon(
+                Icons.mark_email_read_rounded,
+                size: AppSize.size36,
+                color: AppColors.white,
+              ),
             ),
           ),
         ),
-        AppGaps.gap24,
+        AppGaps.gap20,
         Text(
           'Verification Code',
-          style: AppTextStyles.h1,
+          style: AppTextStyles.h2.copyWith(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+            letterSpacing: 0.5,
+          ),
           textAlign: TextAlign.center,
         ),
         AppGaps.gap8,
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: AppSize.size6,
+          runSpacing: AppSize.size4,
           children: [
             Text(
-              'Code sent to ',
-              style: AppTextStyles.bodyMedium,
-            ),
-            Text(
-              phoneNumber,
-              style: AppTextStyles.bodyLarge.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+              '6-digit code sent to',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
               ),
             ),
-            AppGaps.gap4,
-            IconButton(
-              onPressed: onChangeNumberTap,
-              icon: const Icon(
-                Icons.edit_rounded,
-                size: AppSize.size18,
-                color: AppColors.primary,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSize.size8, vertical: AppSize.size2),
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                borderRadius: AppBorderRadius.borderRadius6,
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
               ),
-              tooltip: 'Edit phone number',
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+              child: Text(
+                phoneNumber,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: onChangeNumberTap,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSize.size2),
+                child: const Icon(
+                  Icons.edit_rounded,
+                  size: AppSize.size16,
+                  color: AppColors.primary,
+                ),
+              ),
             ),
           ],
         ),

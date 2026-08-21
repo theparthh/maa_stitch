@@ -29,7 +29,7 @@ class _PhoneLoginContent extends StatefulWidget {
 }
 
 class _PhoneLoginContentState extends State<_PhoneLoginContent>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _headerFadeAnim;
   late Animation<Offset> _headerSlideAnim;
@@ -58,7 +58,7 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
     );
 
     _headerSlideAnim =
-        Tween<Offset>(begin: const Offset(0, -0.2), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero).animate(
       CurvedAnimation(
         parent: _animController,
         curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
@@ -73,7 +73,7 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
     );
 
     _formSlideAnim =
-        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
       CurvedAnimation(
         parent: _animController,
         curve: const Interval(0.3, 0.8, curve: Curves.easeOutCubic),
@@ -121,10 +121,6 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-      ),
       body: SafeArea(
         child: BlocConsumer<PhoneLoginBloc, PhoneLoginState>(
           listener: (context, state) {
@@ -141,107 +137,86 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
                 ),
               );
             } else if (state is PhoneLoginSuccess) {
-              final fullPhone = '${state.selectedCountry.code} ${state.phoneNumber}';
               AppRouteHandler.route.push(
-                OtpVerificationRoute(phoneNumber: fullPhone),
+                OtpVerificationRoute(phoneNumber: state.phoneNumber),
               );
             }
           },
           builder: (context, state) {
-            final repository = context.read<PhoneLoginBloc>().repository;
-            final countries = repository.getSupportedCountryCodes();
             final isSubmitting = state is PhoneLoginSubmitting;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSize.size24,
-                vertical: AppSize.size16,
+                horizontal: AppSize.size20,
+                vertical: AppSize.size24,
               ),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: isSubmitting
-                    ? const KeyedSubtree(
-                        key: ValueKey('login_shimmer'),
-                        child: PhoneLoginShimmerWidget(),
-                      )
-                    : KeyedSubtree(
-                        key: const ValueKey('login_form'),
-                        child: Column(
-                          children: [
-                            AppGaps.gap16,
+              child: Column(
+                children: [
+                  AppGaps.gap24,
 
-                            // Header Section with Slide & Fade Animation
-                            FadeTransition(
-                              opacity: _headerFadeAnim,
-                              child: SlideTransition(
-                                position: _headerSlideAnim,
-                                child: const PhoneLoginHeaderWidget(),
-                              ),
-                            ),
+                  // Header Section with Slide & Fade Animation
+                  FadeTransition(
+                    opacity: _headerFadeAnim,
+                    child: SlideTransition(
+                      position: _headerSlideAnim,
+                      child: const PhoneLoginHeaderWidget(),
+                    ),
+                  ),
 
-                            AppGaps.gap40,
+                  AppGaps.gap24,
 
-                            // Form Section with Shake & Slide Animation
-                            AnimatedBuilder(
-                              animation: _shakeAnim,
-                              builder: (context, child) {
-                                return Transform.translate(
-                                  offset: Offset(_shakeAnim.value, 0),
-                                  child: child,
-                                );
-                              },
-                              child: FadeTransition(
-                                opacity: _formFadeAnim,
-                                child: SlideTransition(
-                                  position: _formSlideAnim,
-                                  child: PhoneInputFieldWidget(
-                                    selectedCountry: state.selectedCountry,
-                                    countries: countries,
-                                    phoneNumber: state.phoneNumber,
-                                    errorMessage: state.errorMessage,
-                                    onPhoneChanged: (val) {
-                                      context
-                                          .read<PhoneLoginBloc>()
-                                          .add(PhoneLoginNumberChanged(val));
-                                    },
-                                    onCountrySelected: (country) {
-                                      context.read<PhoneLoginBloc>().add(
-                                            PhoneLoginCountryCodeChanged(
-                                                country),
-                                          );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            AppGaps.gap32,
-
-                            // Button Section with Scale Animation
-                            ScaleTransition(
-                              scale: _buttonScaleAnim,
-                              child: SendOtpButtonWidget(
-                                isEnabled: state.isValid,
-                                isLoading: isSubmitting,
-                                onPressed: () {
-                                  context
-                                      .read<PhoneLoginBloc>()
-                                      .add(const PhoneLoginSubmitted());
-                                },
-                              ),
-                            ),
-
-                            AppGaps.gap24,
-
-                            // Terms & Privacy caption
-                            Text(
-                              'By continuing, you agree to our Terms of Service\nand Privacy Policy.',
-                              style: AppTextStyles.caption,
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                  // Form Section with Shake & Slide Animation
+                  AnimatedBuilder(
+                    animation: _shakeAnim,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(_shakeAnim.value, 0),
+                        child: child,
+                      );
+                    },
+                    child: FadeTransition(
+                      opacity: _formFadeAnim,
+                      child: SlideTransition(
+                        position: _formSlideAnim,
+                        child: PhoneInputFieldWidget(
+                          phoneNumber: state.phoneNumber,
+                          errorMessage: state.errorMessage,
+                          enabled: !isSubmitting,
+                          onPhoneChanged: (val) {
+                            context
+                                .read<PhoneLoginBloc>()
+                                .add(PhoneLoginNumberChanged(val));
+                          },
                         ),
                       ),
+                    ),
+                  ),
+
+                  AppGaps.gap20,
+
+                  // Button Section with Scale Animation
+                  ScaleTransition(
+                    scale: _buttonScaleAnim,
+                    child: SendOtpButtonWidget(
+                      isEnabled: state.isValid,
+                      isLoading: isSubmitting,
+                      onPressed: () {
+                        context
+                            .read<PhoneLoginBloc>()
+                            .add(const PhoneLoginSubmitted());
+                      },
+                    ),
+                  ),
+
+                  AppGaps.gap16,
+
+                  // Terms & Privacy caption
+                  Text(
+                    'By continuing, you agree to our Terms of Service\nand Privacy Policy.',
+                    style: AppTextStyles.caption,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             );
           },

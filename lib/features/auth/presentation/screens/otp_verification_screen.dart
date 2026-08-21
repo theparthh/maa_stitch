@@ -37,7 +37,7 @@ class _OtpVerificationContent extends StatefulWidget {
 }
 
 class _OtpVerificationContentState extends State<_OtpVerificationContent>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TextEditingController _pinController;
   late FocusNode _pinFocusNode;
 
@@ -71,7 +71,7 @@ class _OtpVerificationContentState extends State<_OtpVerificationContent>
     );
 
     _headerSlideAnim =
-        Tween<Offset>(begin: const Offset(0, -0.2), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero).animate(
       CurvedAnimation(
         parent: _animController,
         curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
@@ -86,7 +86,7 @@ class _OtpVerificationContentState extends State<_OtpVerificationContent>
     );
 
     _pinSlideAnim =
-        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
       CurvedAnimation(
         parent: _animController,
         curve: const Interval(0.3, 0.8, curve: Curves.easeOutCubic),
@@ -149,162 +149,152 @@ class _OtpVerificationContentState extends State<_OtpVerificationContent>
       ),
       body: SafeArea(
         child: BlocConsumer<OtpVerificationBloc, OtpVerificationState>(
-          listener: (context, state) {
-            if (state is OtpVerificationFailure) {
-              _triggerShake();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage ?? 'Verification failed'),
-                  backgroundColor: AppColors.error,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: AppBorderRadius.borderRadius12,
+            listener: (context, state) {
+              if (state is OtpVerificationFailure) {
+                _triggerShake();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage ?? 'Verification failed'),
+                    backgroundColor: AppColors.error,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppBorderRadius.borderRadius12,
+                    ),
                   ),
-                ),
-              );
-            } else if (state is OtpResentSuccess) {
-              _pinController.clear();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('A new OTP has been sent successfully!'),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: AppBorderRadius.borderRadius12,
+                );
+              } else if (state is OtpResentSuccess) {
+                _pinController.clear();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('A new OTP has been sent successfully!'),
+                    backgroundColor: AppColors.success,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppBorderRadius.borderRadius12,
+                    ),
                   ),
-                ),
-              );
-            } else if (state is OtpVerificationSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Phone verified successfully! Welcome.'),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: AppBorderRadius.borderRadius12,
+                );
+              } else if (state is OtpVerificationSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Phone verified successfully! Welcome.'),
+                    backgroundColor: AppColors.success,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppBorderRadius.borderRadius12,
+                    ),
                   ),
+                );
+                // Navigate to Home screen
+                AppRouteHandler.route.replace(const HomeRoute());
+              }
+            },
+            builder: (context, state) {
+              final isVerifying = state is OtpVerifying;
+              final isEnabled = state.otp.length == 6;
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.size20,
+                  vertical: AppSize.size16,
                 ),
-              );
-              // Navigate to Home screen
-              AppRouteHandler.route.replace(const HomeRoute());
-            }
-          },
-          builder: (context, state) {
-            final isVerifying = state is OtpVerifying;
-            final isEnabled = state.otp.length == 4;
+                child: Column(
+                  children: [
+                    AppGaps.gap16,
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSize.size24,
-                vertical: AppSize.size16,
-              ),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: isVerifying
-                    ? const KeyedSubtree(
-                        key: ValueKey('otp_shimmer'),
-                        child: OtpVerificationShimmerWidget(),
-                      )
-                    : KeyedSubtree(
-                        key: const ValueKey('otp_form'),
-                        child: Column(
-                          children: [
-                            AppGaps.gap16,
-
-                            // Header Section with Slide & Fade Animation
-                            FadeTransition(
-                              opacity: _headerFadeAnim,
-                              child: SlideTransition(
-                                position: _headerSlideAnim,
-                                child: OtpHeaderWidget(
-                                  phoneNumber: widget.phoneNumber,
-                                  onChangeNumberTap: () {
-                                    AppRouteHandler.route.pop();
-                                  },
-                                ),
-                              ),
-                            ),
-
-                            AppGaps.gap40,
-
-                            // PIN Input Section with Shake Animation
-                            AnimatedBuilder(
-                              animation: _shakeAnim,
-                              builder: (context, child) {
-                                return Transform.translate(
-                                  offset: Offset(_shakeAnim.value, 0),
-                                  child: child,
-                                );
-                              },
-                              child: FadeTransition(
-                                opacity: _pinFadeAnim,
-                                child: SlideTransition(
-                                  position: _pinSlideAnim,
-                                  child: OtpPinInputWidget(
-                                    controller: _pinController,
-                                    focusNode: _pinFocusNode,
-                                    errorMessage: state.errorMessage,
-                                    onChanged: (val) {
-                                      context
-                                          .read<OtpVerificationBloc>()
-                                          .add(OtpInputChanged(val));
-                                    },
-                                    onCompleted: (pin) {
-                                      context.read<OtpVerificationBloc>().add(
-                                            OtpSubmitted(
-                                              phoneNumber: widget.phoneNumber,
-                                              otp: pin,
-                                            ),
-                                          );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            AppGaps.gap32,
-
-                            // Resend Timer Widget
-                            OtpTimerResendWidget(
-                              timerSeconds: state.timerSeconds,
-                              canResend: state.canResend,
-                              onResendTap: () {
-                                context.read<OtpVerificationBloc>().add(
-                                      OtpResendRequested(
-                                        phoneNumber: widget.phoneNumber,
-                                      ),
-                                    );
-                              },
-                            ),
-
-                            AppGaps.gap32,
-
-                            // Submit Button Section
-                            ScaleTransition(
-                              scale: _buttonScaleAnim,
-                              child: VerifyOtpButtonWidget(
-                                isEnabled: isEnabled,
-                                isLoading: isVerifying,
-                                onPressed: () {
-                                  context.read<OtpVerificationBloc>().add(
-                                        OtpSubmitted(
-                                          phoneNumber: widget.phoneNumber,
-                                          otp: state.otp,
-                                        ),
-                                      );
-                                },
-                              ),
-                            ),
-
-                            AppGaps.gap24,
-                          ],
+                    // Header Section with Slide & Fade Animation
+                    FadeTransition(
+                      opacity: _headerFadeAnim,
+                      child: SlideTransition(
+                        position: _headerSlideAnim,
+                        child: OtpHeaderWidget(
+                          phoneNumber: widget.phoneNumber,
+                          onChangeNumberTap: () {
+                            AppRouteHandler.route.pop();
+                          },
                         ),
                       ),
-              ),
-            );
-          },
+                    ),
+
+                    AppGaps.gap24,
+
+                    // PIN Input Section with Shake Animation
+                    AnimatedBuilder(
+                      animation: _shakeAnim,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(_shakeAnim.value, 0),
+                          child: child,
+                        );
+                      },
+                      child: FadeTransition(
+                        opacity: _pinFadeAnim,
+                        child: SlideTransition(
+                          position: _pinSlideAnim,
+                          child: OtpPinInputWidget(
+                            controller: _pinController,
+                            focusNode: _pinFocusNode,
+                            errorMessage: state.errorMessage,
+                            enabled: !isVerifying,
+                            onChanged: (val) {
+                              context
+                                  .read<OtpVerificationBloc>()
+                                  .add(OtpInputChanged(val));
+                            },
+                            onCompleted: (pin) {
+                              context.read<OtpVerificationBloc>().add(
+                                    OtpSubmitted(
+                                      phoneNumber: widget.phoneNumber,
+                                      otp: pin,
+                                    ),
+                                  );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    AppGaps.gap20,
+
+                    // Resend Timer Widget
+                    OtpTimerResendWidget(
+                      timerSeconds: state.timerSeconds,
+                      canResend: state.canResend && !isVerifying,
+                      onResendTap: () {
+                        context.read<OtpVerificationBloc>().add(
+                              OtpResendRequested(
+                                phoneNumber: widget.phoneNumber,
+                              ),
+                            );
+                      },
+                    ),
+
+                    AppGaps.gap20,
+
+                    // Submit Button Section
+                    ScaleTransition(
+                      scale: _buttonScaleAnim,
+                      child: VerifyOtpButtonWidget(
+                        isEnabled: isEnabled,
+                        isLoading: isVerifying,
+                        onPressed: () {
+                          context.read<OtpVerificationBloc>().add(
+                                OtpSubmitted(
+                                  phoneNumber: widget.phoneNumber,
+                                  otp: state.otp,
+                                ),
+                              );
+                        },
+                      ),
+                    ),
+
+                    AppGaps.gap16,
+                  ],
+                ),
+              );
+            },
+          ),
         ),
-      ),
-    );
+      );
   }
 }

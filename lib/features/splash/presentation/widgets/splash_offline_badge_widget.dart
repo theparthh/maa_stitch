@@ -9,9 +9,9 @@ class SplashOfflineBadgeWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSize.size16, vertical: AppSize.size8),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.primaryLight,
         borderRadius: AppBorderRadius.borderRadius20,
-        border: Border.all(color: AppColors.border, width: AppSize.size1),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15), width: AppSize.size1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -20,7 +20,7 @@ class SplashOfflineBadgeWidget extends StatelessWidget {
             width: AppSize.size8,
             height: AppSize.size8,
             decoration: const BoxDecoration(
-              color: AppColors.secondary,
+              color: AppColors.primary,
               shape: BoxShape.circle,
             ),
           ),
@@ -28,7 +28,8 @@ class SplashOfflineBadgeWidget extends StatelessWidget {
           Text(
             '100% Offline • High Performance Engine',
             style: AppTextStyles.caption.copyWith(
-              color: AppColors.textSecondary,
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

@@ -1,79 +1,117 @@
+import 'package:dartz/dartz.dart';
+import 'package:maa_design_stitch_viewer/app/core/network/api_endpoints.dart';
+import 'package:maa_design_stitch_viewer/app/core/network/api_exception.dart';
+import 'package:maa_design_stitch_viewer/app/core/network/dio_client.dart';
 import 'package:maa_design_stitch_viewer/features/auth/domain/domain.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  static const List<CountryCodeModel> _supportedCountries = [
-    CountryCodeModel(
-      countryName: 'India',
-      code: '+91',
-      flagEmoji: '🇮🇳',
-      phoneLength: 10,
-    ),
-    CountryCodeModel(
-      countryName: 'United States',
-      code: '+1',
-      flagEmoji: '🇺🇸',
-      phoneLength: 10,
-    ),
-    CountryCodeModel(
-      countryName: 'United Kingdom',
-      code: '+44',
-      flagEmoji: '🇬🇧',
-      phoneLength: 10,
-    ),
-    CountryCodeModel(
-      countryName: 'United Arab Emirates',
-      code: '+971',
-      flagEmoji: '🇦🇪',
-      phoneLength: 9,
-    ),
-    CountryCodeModel(
-      countryName: 'Germany',
-      code: '+49',
-      flagEmoji: '🇩🇪',
-      phoneLength: 10,
-    ),
-  ];
+  AuthRepositoryImpl({DioClient? dioClient})
+      : _dioClient = dioClient ?? DioClient();
+
+  final DioClient _dioClient;
 
   @override
-  List<CountryCodeModel> getSupportedCountryCodes() {
-    return _supportedCountries;
-  }
-
-  @override
-  Future<bool> sendOtp({
-    required String countryCode,
+  Future<Either<ApiException, bool>> sendOtp({
     required String phoneNumber,
   }) async {
-    // Simulate network delay
-    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    final response = await _dioClient.postFormUrlEncoded(
+      ApiEndpoints.login,
+      {
+        'mobile': phoneNumber,
+        'name': 'user',
+        'email': 'user@maa.com',
+        'app_source': ApiEndpoints.appSource,
+      },
+    );
 
-    final sanitized = phoneNumber.replaceAll(RegExp(r'\D'), '');
-    if (sanitized == '0000000000') {
-      throw Exception('Server error: Unable to send OTP to this number.');
-    }
-    return true;
+    return response.fold(
+      (exception) => left(exception),
+      (data) {
+        // Handle success response
+        final success = data['success'] == true ||
+            data['status'] == 'success' ||
+            data['status'] == 200 ||
+            !data.containsKey('error');
+        if (success) {
+          return right(true);
+        }
+        final msg = data['message']?.toString() ?? 'Failed to send OTP';
+        return left(ApiException(message: msg));
+      },
+    );
   }
 
   @override
-  Future<AuthResultModel> verifyOtp({
+  Future<Either<ApiException, bool>> resendOtp({
+    required String phoneNumber,
+  }) async {
+    final response = await _dioClient.postFormUrlEncoded(
+      ApiEndpoints.resendOtp,
+      {
+        'mobile': phoneNumber,
+        'app_source': ApiEndpoints.appSource,
+      },
+    );
+
+    return response.fold(
+      (exception) => left(exception),
+      (data) {
+        final success = data['success'] == true ||
+            data['status'] == 'success' ||
+            data['status'] == 200 ||
+            !data.containsKey('error');
+        if (success) {
+          return right(true);
+        }
+        final msg = data['message']?.toString() ?? 'Failed to resend OTP';
+        return left(ApiException(message: msg));
+      },
+    );
+  }
+
+  @override
+  Future<Either<ApiException, AuthResultModel>> verifyOtp({
     required String phoneNumber,
     required String otp,
   }) async {
-    // Simulate network delay
-    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    final response = await _dioClient.postFormUrlEncoded(
+      ApiEndpoints.verifyOtp,
+      {
+        'mobile': phoneNumber,
+        'otp': otp,
+        'device_token': 'device_token_stitch',
+        'app_source': ApiEndpoints.appSource,
+      },
+    );
 
-    if (otp == '0000') {
-      return const AuthResultModel(
-        success: false,
-        errorMessage: 'Invalid OTP entered. Try 1234.',
-      );
-    }
+    return response.fold(
+      (exception) => left(exception),
+      (data) {
+        final success = data['success'] == true ||
+            data['status'] == 'success' ||
+            data['token'] != null ||
+            data['data'] != null;
 
-    // Default demo OTP is 1234 or any non-zero 4-digit OTP
-    return AuthResultModel(
-      success: true,
-      token: 'jwt_auth_token_${DateTime.now().millisecondsSinceEpoch}',
-      userId: 'usr_892341',
+        if (success) {
+          final token = data['token']?.toString() ??
+              data['data']?['token']?.toString() ??
+              'auth_token_${DateTime.now().millisecondsSinceEpoch}';
+          final userId = data['user_id']?.toString() ??
+              data['user']?['id']?.toString() ??
+              'usr_stitch';
+
+          return right(
+            AuthResultModel(
+              success: true,
+              token: token,
+              userId: userId,
+            ),
+          );
+        }
+
+        final msg = data['message']?.toString() ?? 'Invalid OTP entered';
+        return left(ApiException(message: msg));
+      },
     );
   }
 }

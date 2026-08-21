@@ -22,125 +22,173 @@ class HomeViewWidget extends StatelessWidget {
           body: SafeArea(
             child: switch (state) {
               HomeInitial() || HomeLoading() => const Center(
-                  child: CircularProgressIndicator(color: AppColors.secondary),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  ),
                 ),
               HomeError(:final message) => Center(
-                  child: Text(message, style: const TextStyle(color: AppColors.red)),
+                  child: Text(
+                    message,
+                    style: const TextStyle(color: AppColors.error),
+                  ),
                 ),
               HomeLoaded() => Padding(
-                  padding: const EdgeInsets.all(AppSize.size24),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSize.size20,
+                    vertical: AppSize.size20,
+                  ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.all(AppSize.size20),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.withValues(alpha: 0.12),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.grid_on_rounded,
-                          size: 64,
-                          color: AppColors.secondary,
-                        ),
-                      ),
-                      AppGaps.gap20,
-                      Text(
-                        'MAA STITCH VIEWER',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.h1.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      AppGaps.gap8,
-                      Text(
-                        'Directly open and inspect embroidery stitch files',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      AppGaps.gap16,
+                      // Top App Branding Header
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildFormatBadge('.DST', AppColors.secondary),
-                          AppGaps.gap8,
-                          _buildFormatBadge('.EMB', AppColors.blue),
-                          AppGaps.gap8,
-                          _buildFormatBadge('.DHP', AppColors.red),
+                          Container(
+                            width: AppSize.size44,
+                            height: AppSize.size44,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [AppColors.primary, AppColors.secondary],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: AppBorderRadius.borderRadius12,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(alpha: 0.25),
+                                  blurRadius: AppSize.size10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.grid_4x4_rounded,
+                              color: AppColors.white,
+                              size: AppSize.size24,
+                            ),
+                          ),
+                          AppGaps.gap12,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'MAA STITCH VIEWER',
+                                  style: AppTextStyles.h3.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.textPrimary,
+                                    letterSpacing: 0.8,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  'Professional Studio Edition',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.textMuted,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
+
                       const Spacer(),
+
+                      // Main Hero Action Card
                       Container(
-                        width: double.infinity,
                         padding: const EdgeInsets.all(AppSize.size24),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
+                          gradient: const LinearGradient(
+                            colors: [AppColors.primary, AppColors.primaryDark],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           borderRadius: AppBorderRadius.borderRadius24,
-                          border: Border.all(color: AppColors.border),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.black.withValues(alpha: 0.05),
-                              blurRadius: AppSize.size16,
-                              offset: const Offset(0, 4),
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              blurRadius: AppSize.size20,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(AppSize.size14),
-                              decoration: BoxDecoration(
-                                color: AppColors.secondary.withValues(alpha: 0.1),
-                                borderRadius: AppBorderRadius.borderRadius12,
-                              ),
-                              child: const Icon(
-                                Icons.folder_open_rounded,
-                                size: 36,
-                                color: AppColors.secondary,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(AppSize.size12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white.withValues(alpha: 0.12),
+                                    borderRadius: AppBorderRadius.borderRadius16,
+                                  ),
+                                  child: const Icon(
+                                    Icons.folder_open_rounded,
+                                    color: AppColors.white,
+                                    size: AppSize.size32,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    _buildFormatBadgeDark('.DST'),
+                                    AppGaps.gap6,
+                                    _buildFormatBadgeDark('.EMB'),
+                                    AppGaps.gap6,
+                                    _buildFormatBadgeDark('.DHP'),
+                                  ],
+                                ),
+                              ],
                             ),
-                            AppGaps.gap16,
+                            AppGaps.gap20,
                             Text(
-                              'Open Embroidery File',
-                              style: AppTextStyles.h3.copyWith(
-                                color: AppColors.textPrimary,
+                              'Inspect Any Embroidery File',
+                              style: AppTextStyles.h2.copyWith(
+                                color: AppColors.white,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            AppGaps.gap4,
+                            AppGaps.gap8,
                             Text(
-                              'Select any .dst, .emb, or .dhp file from device file manager',
-                              textAlign: TextAlign.center,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.textMuted,
+                              'Render stitch coordinates, visualize thread color changes, and simulate real-time needle playback directly on your device.',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.white.withValues(alpha: 0.8),
+                                height: 1.4,
                               ),
                             ),
-                            AppGaps.gap20,
+                            AppGaps.gap24,
                             SizedBox(
                               width: double.infinity,
+                              height: AppSize.size52,
                               child: ElevatedButton.icon(
                                 onPressed: () {
                                   context.read<HomeBloc>().add(const PickFileHomeEvent());
                                 },
-                                icon: const Icon(Icons.file_upload_rounded, color: AppColors.white),
-                                label: Text(
-                                  'BROWSE FILE MANAGER',
-                                  style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.white,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.0,
-                                  ),
-                                ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.secondary,
-                                  padding: const EdgeInsets.symmetric(vertical: AppSize.size16),
+                                  backgroundColor: AppColors.white,
+                                  foregroundColor: AppColors.primary,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: AppBorderRadius.borderRadius12,
+                                    borderRadius: AppBorderRadius.borderRadius14,
+                                  ),
+                                  elevation: 0,
+                                ),
+                                icon: const Icon(
+                                  Icons.file_upload_outlined,
+                                  color: AppColors.primary,
+                                  size: AppSize.size22,
+                                ),
+                                label: Text(
+                                  'OPEN EMBROIDERY FILE',
+                                  style: AppTextStyles.labelLarge.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.6,
                                   ),
                                 ),
                               ),
@@ -148,6 +196,7 @@ class HomeViewWidget extends StatelessWidget {
                           ],
                         ),
                       ),
+
                       const Spacer(),
                     ],
                   ),
@@ -159,21 +208,23 @@ class HomeViewWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildFormatBadge(String label, Color color) {
+  Widget _buildFormatBadgeDark(String label) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSize.size10,
+        horizontal: AppSize.size8,
         vertical: AppSize.size4,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: AppColors.white.withValues(alpha: 0.15),
         borderRadius: AppBorderRadius.borderRadius8,
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: AppColors.white.withValues(alpha: 0.25),
+        ),
       ),
       child: Text(
         label,
         style: AppTextStyles.caption.copyWith(
-          color: color,
+          color: AppColors.white,
           fontWeight: FontWeight.bold,
         ),
       ),

@@ -11,40 +11,49 @@ class PhoneLoginHeaderWidget extends StatelessWidget {
         Hero(
           tag: 'auth_brand_icon',
           child: Container(
-            width: AppSize.size80,
-            height: AppSize.size80,
+            width: AppSize.size72,
+            height: AppSize.size72,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: AppBorderRadius.borderRadius24,
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.15),
-                width: AppSize.size1_5,
+              gradient: const LinearGradient(
+                colors: [AppColors.primary, AppColors.secondary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              borderRadius: AppBorderRadius.borderRadius24,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: AppColors.primary.withValues(alpha: 0.25),
                   blurRadius: AppSize.size20,
-                  offset: const Offset(0, AppSize.size8),
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.phone_android_rounded,
-              size: AppSize.size40,
-              color: AppColors.primary,
+            child: const Center(
+              child: Icon(
+                Icons.grid_4x4_rounded,
+                size: AppSize.size36,
+                color: AppColors.white,
+              ),
             ),
           ),
         ),
-        AppGaps.gap24,
+        AppGaps.gap20,
         Text(
-          'Welcome Back',
-          style: AppTextStyles.h1,
+          'Welcome to Maa Stitch',
+          style: AppTextStyles.h2.copyWith(
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+            letterSpacing: 0.5,
+          ),
           textAlign: TextAlign.center,
         ),
         AppGaps.gap8,
         Text(
-          'Enter your phone number to receive a 4-digit verification code.',
-          style: AppTextStyles.bodyMedium,
+          'Enter your 10-digit phone number to receive a 6-digit verification code.',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+            height: 1.35,
+          ),
           textAlign: TextAlign.center,
         ),
       ],

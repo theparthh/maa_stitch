@@ -19,7 +19,7 @@ class IconButtonToggleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isActive ? AppColors.secondary.withValues(alpha: 0.25) : AppColors.transparent,
+        color: isActive ? AppColors.primary.withValues(alpha: 0.12) : AppColors.transparent,
         borderRadius: AppBorderRadius.borderRadius8,
       ),
       child: IconButton(
@@ -27,7 +27,7 @@ class IconButtonToggleWidget extends StatelessWidget {
         tooltip: tooltip,
         icon: Icon(
           icon,
-          color: isActive ? AppColors.secondary : AppColors.textMuted,
+          color: isActive ? AppColors.primary : AppColors.textMuted,
           size: AppSize.size20,
         ),
       ),

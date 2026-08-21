@@ -17,27 +17,32 @@ class VerifyOtpButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: AppSize.size56,
+      height: AppSize.size50,
       child: ElevatedButton(
         onPressed: isEnabled && !isLoading ? onPressed : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isEnabled ? AppColors.primary : AppColors.surfaceLight,
+          backgroundColor: isEnabled
+              ? (isLoading ? AppColors.primaryLight : AppColors.primary)
+              : AppColors.surfaceLight,
           foregroundColor: isEnabled ? AppColors.white : AppColors.textMuted,
           disabledBackgroundColor: AppColors.surfaceLight,
           disabledForegroundColor: AppColors.textMuted,
-          elevation: isEnabled ? AppSize.size4 : 0,
-          shadowColor: AppColors.primary.withValues(alpha: 0.3),
+          elevation: isEnabled && !isLoading ? AppSize.size2 : 0,
+          shadowColor: AppColors.primary.withValues(alpha: 0.25),
           shape: RoundedRectangleBorder(
-            borderRadius: AppBorderRadius.borderRadius16,
+            borderRadius: AppBorderRadius.borderRadius14,
+            side: isLoading
+                ? const BorderSide(color: AppColors.primary, width: AppSize.size1_5)
+                : BorderSide.none,
           ),
         ),
         child: isLoading
             ? const SizedBox(
-                width: AppSize.size24,
-                height: AppSize.size24,
+                width: AppSize.size22,
+                height: AppSize.size22,
                 child: CircularProgressIndicator(
-                  strokeWidth: AppSize.size2,
-                  color: AppColors.white,
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                 ),
               )
             : Row(

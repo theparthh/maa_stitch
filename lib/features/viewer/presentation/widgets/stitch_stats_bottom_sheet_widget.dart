@@ -37,7 +37,7 @@ class StitchStatsBottomSheetWidget extends StatelessWidget {
           AppGaps.gap16,
           Text(
             'Embroidery Design Statistics',
-            style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+            style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
           ),
           AppGaps.gap4,
           Text(
@@ -89,14 +89,15 @@ class StitchStatsBottomSheetWidget extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             height: AppSize.size48,
-            child: OutlinedButton(
+            child: ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.secondary,
-                side: const BorderSide(color: AppColors.secondary),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: AppBorderRadius.borderRadius12,
                 ),
+                elevation: 0,
               ),
               child: const Text('CLOSE'),
             ),

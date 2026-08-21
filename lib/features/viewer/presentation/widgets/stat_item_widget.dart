@@ -24,7 +24,7 @@ class StatItemWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.secondary, size: AppSize.size24),
+          Icon(icon, color: AppColors.primary, size: AppSize.size24),
           AppGaps.gap10,
           Expanded(
             child: Column(

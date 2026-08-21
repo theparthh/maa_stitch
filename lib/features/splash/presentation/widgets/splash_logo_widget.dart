@@ -13,24 +13,43 @@ class SplashLogoWidget extends StatelessWidget {
           width: AppSize.size80,
           height: AppSize.size80,
           decoration: BoxDecoration(
-            color: AppColors.secondary.withValues(alpha: 0.1),
-            borderRadius: AppBorderRadius.borderRadius20,
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, AppColors.secondary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: AppBorderRadius.borderRadius24,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.3),
+                blurRadius: AppSize.size20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: const Center(
             child: Icon(
               Icons.grid_4x4_rounded,
-              size: AppSize.size40,
-              color: AppColors.secondary,
+              size: AppSize.size44,
+              color: AppColors.white,
             ),
           ),
         ),
-        AppGaps.gap16,
+        AppGaps.gap20,
         Text(
           'MAA STITCH VIEWER',
           style: AppTextStyles.h2.copyWith(
             color: AppColors.textPrimary,
             letterSpacing: 1.5,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        AppGaps.gap6,
+        Text(
+          'Embroidery CAD Inspection Suite',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w500,
           ),
         ),
         AppGaps.gap24,
@@ -38,7 +57,7 @@ class SplashLogoWidget extends StatelessWidget {
           width: AppSize.size24,
           height: AppSize.size24,
           child: CircularProgressIndicator(
-            color: AppColors.secondary,
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             strokeWidth: 2.5,
           ),
         ),

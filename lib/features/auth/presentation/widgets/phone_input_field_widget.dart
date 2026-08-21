@@ -1,30 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maa_design_stitch_viewer/app/core/theme/theme.dart';
-import 'package:maa_design_stitch_viewer/features/auth/domain/domain.dart';
-import 'package:maa_design_stitch_viewer/features/auth/presentation/widgets/country_code_picker_widget.dart';
 
 class PhoneInputFieldWidget extends StatelessWidget {
   const PhoneInputFieldWidget({
     super.key,
-    required this.selectedCountry,
-    required this.countries,
     required this.phoneNumber,
     required this.onPhoneChanged,
-    required this.onCountrySelected,
     this.errorMessage,
+    this.enabled = true,
   });
 
-  final CountryCodeModel selectedCountry;
-  final List<CountryCodeModel> countries;
   final String phoneNumber;
   final ValueChanged<String> onPhoneChanged;
-  final ValueChanged<CountryCodeModel> onCountrySelected;
   final String? errorMessage;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     final hasError = errorMessage != null && errorMessage!.isNotEmpty;
+    final isComplete = phoneNumber.length == 10;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,12 +36,8 @@ class PhoneInputFieldWidget extends StatelessWidget {
             border: Border.all(
               color: hasError
                   ? AppColors.error
-                  : (phoneNumber.length == selectedCountry.phoneLength
-                      ? AppColors.primary
-                      : AppColors.border),
-              width: hasError || phoneNumber.length == selectedCountry.phoneLength
-                  ? AppSize.size1_5
-                  : AppSize.size1,
+                  : (isComplete ? AppColors.primary : AppColors.border),
+              width: hasError || isComplete ? AppSize.size1_5 : AppSize.size1,
             ),
             boxShadow: [
               BoxShadow(
@@ -58,28 +49,40 @@ class PhoneInputFieldWidget extends StatelessWidget {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(AppSize.size6),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSize.size12,
+            vertical: AppSize.size4,
+          ),
           child: Row(
             children: [
-              CountryCodePickerWidget(
-                selectedCountry: selectedCountry,
-                countries: countries,
-                onCountrySelected: onCountrySelected,
+              Container(
+                padding: const EdgeInsets.all(AppSize.size8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: AppBorderRadius.borderRadius10,
+                ),
+                child: const Icon(
+                  Icons.phone_rounded,
+                  size: AppSize.size18,
+                  color: AppColors.primary,
+                ),
               ),
-              AppGaps.gap8,
+              AppGaps.gap12,
               Expanded(
                 child: TextFormField(
                   initialValue: phoneNumber,
+                  enabled: enabled,
                   keyboardType: TextInputType.phone,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(selectedCountry.phoneLength),
+                    LengthLimitingTextInputFormatter(10),
                   ],
-                  style: AppTextStyles.h3.copyWith(
-                    letterSpacing: 1.5,
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.2,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Enter ${selectedCountry.phoneLength} digits',
+                    hintText: 'Enter 10-digit mobile number',
                     hintStyle: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textMuted,
                       letterSpacing: 0,
@@ -88,11 +91,11 @@ class PhoneInputFieldWidget extends StatelessWidget {
                     focusedBorder: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSize.size8,
                       vertical: AppSize.size10,
                     ),
-                    suffixIcon: phoneNumber.isNotEmpty
+                    suffixIcon: phoneNumber.isNotEmpty && enabled
                         ? IconButton(
                             icon: const Icon(
                               Icons.cancel_rounded,
