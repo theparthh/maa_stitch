@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:maa_design_stitch_viewer/app/core/helpers/connectivity_helper.dart';
 import 'package:maa_design_stitch_viewer/app/core/theme/theme.dart';
 
@@ -123,13 +124,9 @@ class _AppConnectivityGateState extends State<AppConnectivityGate> {
                         ),
                       ),
                       icon: _isRetrying
-                          ? const SizedBox(
-                              width: AppSize.size18,
-                              height: AppSize.size18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.white,
-                              ),
+                          ? LoadingAnimationWidget.fallingDot(
+                              color: AppColors.white,
+                              size: 24,
                             )
                           : const Icon(Icons.refresh_rounded),
                       label: const Text('Try Again'),

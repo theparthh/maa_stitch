@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
 
 class SplashLogoWidget extends StatelessWidget {
@@ -37,7 +38,7 @@ class SplashLogoWidget extends StatelessWidget {
         ),
         AppGaps.gap20,
         Text(
-          'MAA STITCH VIEWER',
+          'VIEW STITCH',
           style: AppTextStyles.h2.copyWith(
             color: AppColors.textPrimary,
             letterSpacing: 1.5,
@@ -53,13 +54,9 @@ class SplashLogoWidget extends StatelessWidget {
           ),
         ),
         AppGaps.gap24,
-        const SizedBox(
-          width: AppSize.size24,
-          height: AppSize.size24,
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-            strokeWidth: 2.5,
-          ),
+        LoadingAnimationWidget.fallingDot(
+          color: AppColors.secondary,
+          size: 36,
         ),
       ],
     );

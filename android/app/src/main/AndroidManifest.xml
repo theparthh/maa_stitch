@@ -1,11 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="maa_design_stitch_viewer"
+        android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
+            android:label="@string/app_name"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
@@ -27,7 +28,7 @@
             </intent-filter>
 
             <!-- Intent filter for opening .dst, .emb, .dhp embroidery files from file manager, WhatsApp, Gmail, etc. -->
-            <intent-filter android:label="Maa Stitch Viewer">
+            <intent-filter android:label="View Stitch">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />

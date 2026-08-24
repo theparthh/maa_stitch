@@ -10,12 +10,40 @@ part 'app_router.gr.dart';
 @AutoRouterConfig()
 class AppRouter extends RootStackRouter {
   @override
+  RouteType get defaultRouteType => RouteType.custom(
+        transitionsBuilder: TransitionsBuilders.fadeIn,
+        duration: const Duration(milliseconds: 300),
+        reverseDuration: const Duration(milliseconds: 300),
+      );
+
+  @override
   List<AutoRoute> get routes => [
-        AutoRoute(page: SplashRoute.page, initial: true),
-        AutoRoute(page: PhoneLoginRoute.page),
-        AutoRoute(page: OtpVerificationRoute.page),
-        AutoRoute(page: HomeRoute.page),
-        AutoRoute(page: ViewerRoute.page),
+        CustomRoute(
+          page: SplashRoute.page,
+          initial: true,
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          duration: const Duration(milliseconds: 300),
+        ),
+        CustomRoute(
+          page: PhoneLoginRoute.page,
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          duration: const Duration(milliseconds: 300),
+        ),
+        CustomRoute(
+          page: OtpVerificationRoute.page,
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          duration: const Duration(milliseconds: 300),
+        ),
+        CustomRoute(
+          page: HomeRoute.page,
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          duration: const Duration(milliseconds: 300),
+        ),
+        CustomRoute(
+          page: ViewerRoute.page,
+          transitionsBuilder: TransitionsBuilders.fadeIn,
+          duration: const Duration(milliseconds: 300),
+        ),
       ];
 }
 

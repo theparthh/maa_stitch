@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
 import 'package:maa_design_stitch_viewer/app/router/app_route_handler.dart';
 import 'package:maa_design_stitch_viewer/app/router/app_router.dart';
@@ -21,9 +22,10 @@ class HomeViewWidget extends StatelessWidget {
           backgroundColor: AppColors.background,
           body: SafeArea(
             child: switch (state) {
-              HomeInitial() || HomeLoading() => const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              HomeInitial() || HomeLoading() => Center(
+                  child: LoadingAnimationWidget.fallingDot(
+                    color: AppColors.secondary,
+                    size: 48,
                   ),
                 ),
               HomeError(:final message) => Center(
@@ -32,7 +34,7 @@ class HomeViewWidget extends StatelessWidget {
                     style: const TextStyle(color: AppColors.error),
                   ),
                 ),
-              HomeLoaded() => Padding(
+              HomeLoaded() => SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSize.size20,
                     vertical: AppSize.size20,
@@ -40,66 +42,7 @@ class HomeViewWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Top App Branding Header
-                      Row(
-                        children: [
-                          Container(
-                            width: AppSize.size44,
-                            height: AppSize.size44,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [AppColors.primary, AppColors.secondary],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: AppBorderRadius.borderRadius12,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.25),
-                                  blurRadius: AppSize.size10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.grid_4x4_rounded,
-                              color: AppColors.white,
-                              size: AppSize.size24,
-                            ),
-                          ),
-                          AppGaps.gap12,
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'MAA STITCH VIEWER',
-                                  style: AppTextStyles.h3.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.textPrimary,
-                                    letterSpacing: 0.8,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  'Professional Studio Edition',
-                                  style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.textMuted,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const Spacer(),
-
-                      // Main Hero Action Card
+                      // Main Hero Action Card (File Opener)
                       Container(
                         padding: const EdgeInsets.all(AppSize.size24),
                         decoration: BoxDecoration(
@@ -196,8 +139,6 @@ class HomeViewWidget extends StatelessWidget {
                           ],
                         ),
                       ),
-
-                      const Spacer(),
                     ],
                   ),
                 ),

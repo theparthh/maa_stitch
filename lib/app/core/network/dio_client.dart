@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:maa_design_stitch_viewer/app/core/network/api_endpoints.dart';
 import 'package:maa_design_stitch_viewer/app/core/network/api_exception.dart';
+import 'package:maa_design_stitch_viewer/app/core/network/api_logging_interceptor.dart';
 
 class DioClient {
   DioClient()
@@ -15,13 +16,15 @@ class DioClient {
               'Content-Type': 'application/x-www-form-urlencoded',
             },
           ),
-        );
+        ) {
+    _dio.interceptors.add(ApiLoggingInterceptor());
+  }
 
   final Dio _dio;
 
   Future<Either<ApiException, Map<String, dynamic>>> postFormUrlEncoded(
     String path,
-    Map<String, String> data,
+    Map<String, dynamic> data,
   ) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(

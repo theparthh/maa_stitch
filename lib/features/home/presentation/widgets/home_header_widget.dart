@@ -10,7 +10,7 @@ class HomeHeaderWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'MAA STITCH VIEWER',
+          'VIEW STITCH',
           style: AppTextStyles.h2.copyWith(
             color: AppColors.textPrimary,
             letterSpacing: 1.2,

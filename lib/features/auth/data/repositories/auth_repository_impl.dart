@@ -18,8 +18,6 @@ class AuthRepositoryImpl implements AuthRepository {
       ApiEndpoints.login,
       {
         'mobile': phoneNumber,
-        'name': 'user',
-        'email': 'user@maa.com',
         'app_source': ApiEndpoints.appSource,
       },
     );

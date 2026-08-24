@@ -26,16 +26,12 @@ class PhoneLoginBloc extends Bloc<PhoneLoginEvent, PhoneLoginState> {
   ) {
     final sanitized = event.phoneNumber.replaceAll(RegExp(r'\D'), '');
     final isValid = sanitized.length == 10;
-    String? errorMessage;
-    if (sanitized.isNotEmpty && !isValid) {
-      errorMessage = 'Please enter a valid 10-digit mobile number';
-    }
 
     emit(
       PhoneLoginInitial(
         phoneNumber: sanitized,
         isValid: isValid,
-        errorMessage: errorMessage,
+        errorMessage: null,
       ),
     );
   }
@@ -44,7 +40,20 @@ class PhoneLoginBloc extends Bloc<PhoneLoginEvent, PhoneLoginState> {
     PhoneLoginSubmitted event,
     Emitter<PhoneLoginState> emit,
   ) async {
-    if (!state.isValid) {
+    if (state is PhoneLoginSubmitting) return;
+
+    final sanitized = state.phoneNumber.replaceAll(RegExp(r'\D'), '');
+    if (sanitized.isEmpty) {
+      emit(
+        PhoneLoginFailure(
+          phoneNumber: state.phoneNumber,
+          errorMessage: 'Please enter your mobile number',
+        ),
+      );
+      return;
+    }
+
+    if (sanitized.length != 10) {
       emit(
         PhoneLoginFailure(
           phoneNumber: state.phoneNumber,
@@ -59,7 +68,8 @@ class PhoneLoginBloc extends Bloc<PhoneLoginEvent, PhoneLoginState> {
       emit(
         PhoneLoginFailure(
           phoneNumber: state.phoneNumber,
-          errorMessage: 'No internet connection. Please check your network and try again.',
+          errorMessage:
+              'No internet connection. Please check your network and try again.',
         ),
       );
       return;

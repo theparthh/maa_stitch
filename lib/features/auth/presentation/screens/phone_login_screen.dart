@@ -46,14 +46,14 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
     super.initState();
 
     _animController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
     _headerFadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animController,
-        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
+        curve: const Interval(0.0, 0.45, curve: Curves.easeOut),
       ),
     );
 
@@ -68,7 +68,7 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
     _formFadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animController,
-        curve: const Interval(0.3, 0.7, curve: Curves.easeOut),
+        curve: const Interval(0.3, 0.75, curve: Curves.easeOut),
       ),
     );
 
@@ -80,10 +80,10 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
       ),
     );
 
-    _buttonScaleAnim = Tween<double>(begin: 0.8, end: 1.0).animate(
+    _buttonScaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
       CurvedAnimation(
         parent: _animController,
-        curve: const Interval(0.6, 1.0, curve: Curves.elasticOut),
+        curve: const Interval(0.55, 1.0, curve: Curves.easeOutBack),
       ),
     );
 
@@ -119,107 +119,175 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: BlocConsumer<PhoneLoginBloc, PhoneLoginState>(
-          listener: (context, state) {
-            if (state is PhoneLoginFailure) {
-              _triggerShake();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage ?? 'An error occurred'),
-                  backgroundColor: AppColors.error,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: AppBorderRadius.borderRadius12,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: BlocConsumer<PhoneLoginBloc, PhoneLoginState>(
+            listener: (context, state) {
+              if (state is PhoneLoginFailure) {
+                _triggerShake();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: AppColors.white,
+                          size: 20,
+                        ),
+                        AppGaps.gap12,
+                        Expanded(
+                          child: Text(
+                            state.errorMessage ?? 'An error occurred',
+                            style: const TextStyle(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: AppColors.error,
+                    behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.all(AppSize.size16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppBorderRadius.borderRadius12,
+                    ),
+                  ),
+                );
+              } else if (state is PhoneLoginSuccess) {
+                AppRouteHandler.route.push(
+                  OtpVerificationRoute(phoneNumber: state.phoneNumber),
+                );
+              }
+            },
+            builder: (context, state) {
+              final isSubmitting = state is PhoneLoginSubmitting;
+
+              return Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSize.size20,
+                    vertical: AppSize.size24,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Header Section
+                      FadeTransition(
+                        opacity: _headerFadeAnim,
+                        child: SlideTransition(
+                          position: _headerSlideAnim,
+                          child: const PhoneLoginHeaderWidget(),
+                        ),
+                      ),
+
+                      AppGaps.gap32,
+
+                      // Card Container
+                      Container(
+                        padding: const EdgeInsets.all(AppSize.size20),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: AppBorderRadius.borderRadius24,
+                          border: Border.all(
+                            color: AppColors.border.withValues(alpha: 0.8),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.05),
+                              blurRadius: 24,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Phone Input with Shake Animation on Error
+                            AnimatedBuilder(
+                              animation: _shakeAnim,
+                              builder: (context, child) {
+                                return Transform.translate(
+                                  offset: Offset(_shakeAnim.value, 0),
+                                  child: child,
+                                );
+                              },
+                              child: FadeTransition(
+                                opacity: _formFadeAnim,
+                                child: SlideTransition(
+                                  position: _formSlideAnim,
+                                  child: PhoneInputFieldWidget(
+                                    phoneNumber: state.phoneNumber,
+                                    errorMessage: state.errorMessage,
+                                    enabled: !isSubmitting,
+                                    onPhoneChanged: (val) {
+                                      context
+                                          .read<PhoneLoginBloc>()
+                                          .add(PhoneLoginNumberChanged(val));
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            AppGaps.gap20,
+
+                            // Submit Button
+                            ScaleTransition(
+                              scale: _buttonScaleAnim,
+                              child: SendOtpButtonWidget(
+                                isEnabled: state.isValid,
+                                isLoading: isSubmitting,
+                                onPressed: () {
+                                  context
+                                      .read<PhoneLoginBloc>()
+                                      .add(const PhoneLoginSubmitted());
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      AppGaps.gap24,
+
+                      // Security & Privacy trust footer
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.shield_outlined,
+                            size: 16,
+                            color: AppColors.textMuted.withValues(alpha: 0.8),
+                          ),
+                          AppGaps.gap6,
+                          Text(
+                            'Instant SMS verification code via secure gateway',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      AppGaps.gap12,
+                      Text(
+                        'By continuing, you agree to our Terms of Service & Privacy Policy.',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textMuted.withValues(alpha: 0.7),
+                          fontSize: 11,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               );
-            } else if (state is PhoneLoginSuccess) {
-              AppRouteHandler.route.push(
-                OtpVerificationRoute(phoneNumber: state.phoneNumber),
-              );
-            }
-          },
-          builder: (context, state) {
-            final isSubmitting = state is PhoneLoginSubmitting;
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSize.size20,
-                vertical: AppSize.size24,
-              ),
-              child: Column(
-                children: [
-                  AppGaps.gap24,
-
-                  // Header Section with Slide & Fade Animation
-                  FadeTransition(
-                    opacity: _headerFadeAnim,
-                    child: SlideTransition(
-                      position: _headerSlideAnim,
-                      child: const PhoneLoginHeaderWidget(),
-                    ),
-                  ),
-
-                  AppGaps.gap24,
-
-                  // Form Section with Shake & Slide Animation
-                  AnimatedBuilder(
-                    animation: _shakeAnim,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(_shakeAnim.value, 0),
-                        child: child,
-                      );
-                    },
-                    child: FadeTransition(
-                      opacity: _formFadeAnim,
-                      child: SlideTransition(
-                        position: _formSlideAnim,
-                        child: PhoneInputFieldWidget(
-                          phoneNumber: state.phoneNumber,
-                          errorMessage: state.errorMessage,
-                          enabled: !isSubmitting,
-                          onPhoneChanged: (val) {
-                            context
-                                .read<PhoneLoginBloc>()
-                                .add(PhoneLoginNumberChanged(val));
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  AppGaps.gap20,
-
-                  // Button Section with Scale Animation
-                  ScaleTransition(
-                    scale: _buttonScaleAnim,
-                    child: SendOtpButtonWidget(
-                      isEnabled: state.isValid,
-                      isLoading: isSubmitting,
-                      onPressed: () {
-                        context
-                            .read<PhoneLoginBloc>()
-                            .add(const PhoneLoginSubmitted());
-                      },
-                    ),
-                  ),
-
-                  AppGaps.gap16,
-
-                  // Terms & Privacy caption
-                  Text(
-                    'By continuing, you agree to our Terms of Service\nand Privacy Policy.',
-                    style: AppTextStyles.caption,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          },
+            },
+          ),
         ),
       ),
     );

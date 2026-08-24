@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
 import 'package:maa_design_stitch_viewer/app/router/app_route_handler.dart';
 import 'package:maa_design_stitch_viewer/features/viewer/presentation/bloc/bloc.dart';
@@ -50,8 +51,11 @@ class _ViewerViewWidgetState extends State<ViewerViewWidget> {
         return Scaffold(
           backgroundColor: AppColors.background,
           body: switch (state) {
-            ViewerInitial() || ViewerLoading() => const Center(
-                child: CircularProgressIndicator(color: AppColors.secondary),
+            ViewerInitial() || ViewerLoading() => Center(
+                child: LoadingAnimationWidget.fallingDot(
+                  color: AppColors.secondary,
+                  size: 48,
+                ),
               ),
             ViewerError(:final message) => Center(
                 child: Column(
