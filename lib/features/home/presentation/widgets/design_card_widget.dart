@@ -52,7 +52,8 @@ class DesignCardWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
                     borderRadius: AppBorderRadius.borderRadius12,
-                    border: Border.all(color: badgeColor.withValues(alpha: 0.4)),
+                    border:
+                        Border.all(color: badgeColor.withValues(alpha: 0.4)),
                   ),
                   child: Center(
                     child: Column(

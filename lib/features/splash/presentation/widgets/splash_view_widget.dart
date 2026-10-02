@@ -18,6 +18,8 @@ class SplashViewWidget extends StatelessWidget {
             AppRouteHandler.route.replace(
               ViewerRoute(filePath: state.initialFilePath!),
             );
+          } else if (state.isAuthenticated) {
+            AppRouteHandler.route.replace(const HomeRoute());
           } else {
             AppRouteHandler.route.replace(const PhoneLoginRoute());
           }

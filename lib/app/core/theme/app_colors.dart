@@ -7,7 +7,7 @@ abstract class AppColors {
   static const Color secondary = Color(0xff1d4ed8); // Royal Blue Accent
   static const Color blue = Color(0xff2563eb); // Vivid Blue
   static const Color blueLight = Color(0xff38bdf8); // Sky Cyan Accent
-  
+
   // Standard Tokens
   static const Color white = Colors.white;
   static const Color black = Colors.black;
@@ -44,23 +44,23 @@ abstract class AppColors {
   static const Color pinBorderFocused = Color(0xff0f2b5c);
   static const Color pinBg = Color(0xfff8fafc);
 
-  // Embroidery Thread Color Palette Defaults (Dark Blue, Steel & Multi-tone Threads)
+  // Embroidery Thread Color Palette Defaults (Exact Commercial Embroidery Match)
   static const List<Color> defaultThreadPalette = [
-    Color(0xff0f2b5c), // Midnight Navy
-    Color(0xff1d4ed8), // Royal Blue
-    Color(0xff0284c7), // Ocean Blue
-    Color(0xff38bdf8), // Sky Blue
-    Color(0xffd97706), // Amber Gold
-    Color(0xffdc2626), // Crimson Red
-    Color(0xff9333ea), // Deep Violet
-    Color(0xff0891b2), // Turquoise
-    Color(0xffeab308), // Bright Yellow
-    Color(0xff091836), // Midnight Black
-    Color(0xffea580c), // Sunset Orange
-    Color(0xffec4899), // Hot Pink
-    Color(0xff4f46e5), // Indigo Silk
-    Color(0xff78350f), // Warm Chocolate
-    Color(0xffb91c1c), // Ruby Garnet
+    Color(0xff5036b1), // 0: Royal Sapphire Blue (Top-Right Flowers)
+    Color(0xff539943), // 1: Emerald Leaf Green (Top-Left Flowers)
+    Color(0xffc82323), // 2: Crimson Red (Vines, Leaves & Border)
+    Color(0xff00bcd4), // 3: Vibrant Cyan / Turquoise (Pearls & Discs)
+    Color(0xffece23c), // 4: Warm Gold / Yellow (Inner Dots)
+    Color(0xffa72d9e), // 5: Royal Purple / Magenta (V-Neck Collar)
+    Color(0xffe91e63), // 6: Rose Pink
+    Color(0xffea580c), // 7: Sunset Orange
+    Color(0xff0f2b5c), // 8: Deep Midnight Navy
+    Color(0xff8e24aa), // 9: Deep Violet
+    Color(0xff00897b), // 10: Teal Green
+    Color(0xfffdd835), // 11: Sunflower Yellow
+    Color(0xff4f46e5), // 12: Indigo Silk
+    Color(0xff78350f), // 13: Warm Chocolate
+    Color(0xffb91c1c), // 14: Ruby Garnet
     Color(0xff64748b), // Slate Grey
   ];
 }

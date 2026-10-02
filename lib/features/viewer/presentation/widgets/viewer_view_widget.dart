@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
 import 'package:maa_design_stitch_viewer/app/router/app_route_handler.dart';
+import 'package:maa_design_stitch_viewer/app/router/app_router.dart';
 import 'package:maa_design_stitch_viewer/features/viewer/presentation/bloc/bloc.dart';
 import 'package:maa_design_stitch_viewer/features/viewer/presentation/widgets/widgets.dart';
 
@@ -15,6 +16,7 @@ class ViewerViewWidget extends StatefulWidget {
 
 class _ViewerViewWidgetState extends State<ViewerViewWidget> {
   late TransformationController _transformationController;
+  int? _selectedColorIndex;
 
   @override
   void initState() {
@@ -49,53 +51,68 @@ class _ViewerViewWidgetState extends State<ViewerViewWidget> {
     return BlocBuilder<ViewerBloc, ViewerState>(
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: AppColors.background,
-          body: switch (state) {
-            ViewerInitial() || ViewerLoading() => Center(
-                child: LoadingAnimationWidget.fallingDot(
-                  color: AppColors.secondary,
-                  size: 48,
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            top: false,
+            bottom: true,
+            child: switch (state) {
+              ViewerInitial() || ViewerLoading() => Center(
+                  child: LoadingAnimationWidget.fallingDot(
+                    color: AppColors.secondary,
+                    size: 48,
+                  ),
                 ),
-              ),
-            ViewerError(:final message) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              ViewerError(:final message) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(message, style: const TextStyle(color: AppColors.red)),
+                      AppGaps.gap16,
+                      ElevatedButton(
+                        onPressed: () {
+                          if (AppRouteHandler.route.canPop()) {
+                            AppRouteHandler.route.pop();
+                          } else {
+                            AppRouteHandler.route.replace(const HomeRoute());
+                          }
+                        },
+                        child: const Text('Back'),
+                      ),
+                    ],
+                  ),
+                ),
+              ViewerLoaded(:final design) => Stack(
                   children: [
-                    Text(message, style: const TextStyle(color: AppColors.red)),
-                    AppGaps.gap16,
-                    ElevatedButton(
-                      onPressed: () => AppRouteHandler.route.pop(),
-                      child: const Text('Back'),
+                    Positioned.fill(
+                      child: StitchCanvasWidget(
+                        design: design,
+                        showJumpStitches: false,
+                        showGrid: false,
+                        showStitchPoints: false,
+                        selectedColorIndex: _selectedColorIndex,
+                        currentStitchStep: design.totalStitches,
+                        transformationController: _transformationController,
+                      ),
                     ),
-                  ],
-                ),
-              ),
-            ViewerLoaded(:final design) => Stack(
-                children: [
-                  Positioned.fill(
-                    child: StitchCanvasWidget(
-                      design: design,
-                      showJumpStitches: true,
-                      showGrid: false,
-                      showStitchPoints: false,
-                      selectedColorIndex: null,
-                      currentStitchStep: design.totalStitches,
-                      transformationController: _transformationController,
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: ViewerToolbarWidget(
+                        design: design,
+                        onBackTap: () {
+                          if (AppRouteHandler.route.canPop()) {
+                            AppRouteHandler.route.pop();
+                          } else {
+                            AppRouteHandler.route.replace(const HomeRoute());
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: ViewerToolbarWidget(
-                      design: design,
-                      onBackTap: () => AppRouteHandler.route.pop(),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: AppSize.size24,
-                    right: AppSize.size20,
-                    child: Container(
+                    Positioned(
+                      bottom: AppSize.size20,
+                      right: AppSize.size20,
+                      child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: AppBorderRadius.borderRadius16,
@@ -113,19 +130,22 @@ class _ViewerViewWidgetState extends State<ViewerViewWidget> {
                         children: [
                           IconButton(
                             onPressed: _zoomIn,
-                            icon: const Icon(Icons.add_rounded, color: AppColors.textPrimary),
+                            icon: const Icon(Icons.add_rounded,
+                                color: AppColors.textPrimary),
                             tooltip: 'Zoom In',
                           ),
                           const Divider(height: 1, color: AppColors.border),
                           IconButton(
                             onPressed: _zoomOut,
-                            icon: const Icon(Icons.remove_rounded, color: AppColors.textPrimary),
+                            icon: const Icon(Icons.remove_rounded,
+                                color: AppColors.textPrimary),
                             tooltip: 'Zoom Out',
                           ),
                           const Divider(height: 1, color: AppColors.border),
                           IconButton(
                             onPressed: _resetZoom,
-                            icon: const Icon(Icons.center_focus_strong_rounded, color: AppColors.secondary),
+                            icon: const Icon(Icons.center_focus_strong_rounded,
+                                color: AppColors.secondary),
                             tooltip: 'Reset Zoom',
                           ),
                         ],
@@ -134,9 +154,11 @@ class _ViewerViewWidgetState extends State<ViewerViewWidget> {
                   ),
                 ],
               ),
-          },
+            },
+          ),
         );
       },
     );
   }
 }
+

@@ -10,33 +10,16 @@ class SplashLogoWidget extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: AppSize.size80,
-          height: AppSize.size80,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.secondary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: AppBorderRadius.borderRadius24,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                blurRadius: AppSize.size20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Center(
-            child: Icon(
-              Icons.grid_4x4_rounded,
-              size: AppSize.size44,
-              color: AppColors.white,
-            ),
+        Hero(
+          tag: 'app_brand_logo',
+          child: Image.asset(
+            AppAssets.appLogo,
+            width: AppSize.size140,
+            height: AppSize.size140,
+            fit: BoxFit.contain,
           ),
         ),
-        AppGaps.gap20,
+        AppGaps.gap24,
         Text(
           'VIEW STITCH',
           style: AppTextStyles.h2.copyWith(
@@ -56,7 +39,7 @@ class SplashLogoWidget extends StatelessWidget {
         AppGaps.gap24,
         LoadingAnimationWidget.fallingDot(
           color: AppColors.secondary,
-          size: 36,
+          size: AppSize.size36,
         ),
       ],
     );

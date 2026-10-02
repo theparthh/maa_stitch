@@ -27,14 +27,24 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <!-- Intent filter for opening .dst, .emb, .dhp embroidery files from file manager, WhatsApp, Gmail, etc. -->
+            <!-- Intent filter for apps sending content/file URIs (WhatsApp, Gmail, Telegram, Downloads) -->
+            <intent-filter android:label="View Stitch">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+            <!-- Intent filter for file managers opening directly by extension -->
             <intent-filter android:label="View Stitch">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="file" />
                 <data android:scheme="content" />
-                <data android:mimeType="*/*" />
+                <data android:host="*" />
                 <data android:pathPattern=".*\\.dst" />
                 <data android:pathPattern=".*\\.emb" />
                 <data android:pathPattern=".*\\.dhp" />

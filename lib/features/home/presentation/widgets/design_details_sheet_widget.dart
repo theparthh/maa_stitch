@@ -57,7 +57,8 @@ class DesignDetailsSheetWidget extends StatelessWidget {
                   children: [
                     Text(
                       design.fileName,
-                      style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+                      style: AppTextStyles.h3
+                          .copyWith(color: AppColors.textPrimary),
                     ),
                     AppGaps.gap4,
                     Text(
@@ -97,7 +98,8 @@ class DesignDetailsSheetWidget extends StatelessWidget {
                 DetailRowWidget(
                   icon: Icons.aspect_ratio_rounded,
                   label: 'Dimensions',
-                  value: '${design.widthMm.toStringAsFixed(1)} mm × ${design.heightMm.toStringAsFixed(1)} mm',
+                  value:
+                      '${design.widthMm.toStringAsFixed(1)} mm × ${design.heightMm.toStringAsFixed(1)} mm',
                 ),
                 const Divider(color: AppColors.border, height: AppSize.size24),
                 DetailRowWidget(
@@ -127,7 +129,8 @@ class DesignDetailsSheetWidget extends StatelessWidget {
               icon: const Icon(Icons.zoom_in_rounded),
               label: Text(
                 'OPEN DESIGN IN VIEWER',
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+                style:
+                    AppTextStyles.labelLarge.copyWith(color: AppColors.white),
               ),
             ),
           ),

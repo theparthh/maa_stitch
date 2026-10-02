@@ -96,7 +96,8 @@ class OtpVerificationBloc
       emit(
         OtpVerificationFailure(
           otp: event.otp,
-          errorMessage: 'No internet connection. Please check your network and try again.',
+          errorMessage:
+              'No internet connection. Please check your network and try again.',
           timerSeconds: state.timerSeconds,
           canResend: state.timerSeconds <= 0,
         ),

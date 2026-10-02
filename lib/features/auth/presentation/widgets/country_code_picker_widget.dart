@@ -72,14 +72,14 @@ class CountryCodePickerWidget extends StatelessWidget {
                           : AppColors.transparent,
                       leading: Text(
                         country.flagEmoji,
-                        style: const TextStyle(fontSize: AppFontSize.fontSize24),
+                        style:
+                            const TextStyle(fontSize: AppFontSize.fontSize24),
                       ),
                       title: Text(
                         country.countryName,
                         style: AppTextStyles.bodyLarge.copyWith(
-                          fontWeight: isSelected
-                              ? FontWeight.w700
-                              : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
                           color: isSelected
                               ? AppColors.primary
                               : AppColors.textPrimary,

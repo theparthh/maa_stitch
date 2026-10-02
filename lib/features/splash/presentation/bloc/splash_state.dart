@@ -16,10 +16,14 @@ final class SplashLoading extends SplashState {
 }
 
 final class SplashCompleted extends SplashState {
-  const SplashCompleted({this.initialFilePath});
+  const SplashCompleted({
+    this.initialFilePath,
+    required this.isAuthenticated,
+  });
 
   final String? initialFilePath;
+  final bool isAuthenticated;
 
   @override
-  List<Object?> get props => [initialFilePath];
+  List<Object?> get props => [initialFilePath, isAuthenticated];
 }

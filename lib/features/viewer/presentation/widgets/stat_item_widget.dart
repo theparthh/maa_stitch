@@ -35,7 +35,8 @@ class StatItemWidget extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textMuted),
+                  style: AppTextStyles.caption
+                      .copyWith(color: AppColors.textMuted),
                 ),
                 AppGaps.gap2,
                 Text(

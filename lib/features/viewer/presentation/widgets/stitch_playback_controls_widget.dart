@@ -26,7 +26,8 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSize.size16, vertical: AppSize.size8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.size16, vertical: AppSize.size8),
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.98),
         border: const Border(top: BorderSide(color: AppColors.border)),
@@ -46,7 +47,9 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
               IconButton(
                 onPressed: onPlayToggle,
                 icon: Icon(
-                  isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_fill_rounded,
+                  isPlaying
+                      ? Icons.pause_circle_filled_rounded
+                      : Icons.play_circle_fill_rounded,
                   color: AppColors.primary,
                   size: AppSize.size36,
                 ),
@@ -62,9 +65,13 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
                     trackHeight: AppSize.size4,
                   ),
                   child: Slider(
-                    value: currentStep.toDouble().clamp(0, totalStitches.toDouble()),
+                    value: currentStep
+                        .toDouble()
+                        .clamp(0, totalStitches.toDouble()),
                     min: 0,
-                    max: totalStitches.toDouble() > 0 ? totalStitches.toDouble() : 1.0,
+                    max: totalStitches.toDouble() > 0
+                        ? totalStitches.toDouble()
+                        : 1.0,
                     onChanged: (val) => onStepChanged(val.toInt()),
                   ),
                 ),
@@ -84,11 +91,13 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
                 onSelected: onSpeedChanged,
                 color: AppColors.surface,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSize.size8, vertical: AppSize.size4),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSize.size8, vertical: AppSize.size4),
                   decoration: BoxDecoration(
                     color: AppColors.primaryLight,
                     borderRadius: AppBorderRadius.borderRadius8,
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                    border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.2)),
                   ),
                   child: Text(
                     '${speed.toStringAsFixed(0)}x',

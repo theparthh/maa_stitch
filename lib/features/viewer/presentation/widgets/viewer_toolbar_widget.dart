@@ -36,7 +36,8 @@ class ViewerToolbarWidget extends StatelessWidget {
           children: [
             IconButton(
               onPressed: onBackTap,
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.primary),
+              icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                  color: AppColors.primary),
             ),
             AppGaps.gap8,
             Expanded(

@@ -50,7 +50,8 @@ class FileImportCardWidget extends StatelessWidget {
                   children: [
                     Text(
                       'Open Embroidery File',
-                      style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+                      style: AppTextStyles.h3
+                          .copyWith(color: AppColors.textPrimary),
                     ),
                     AppGaps.gap2,
                     Text(

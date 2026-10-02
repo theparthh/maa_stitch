@@ -14,10 +14,11 @@ class ApiLoggingInterceptor extends Interceptor {
     options.extra['request_start_time'] = DateTime.now().millisecondsSinceEpoch;
 
     final buffer = StringBuffer();
-    buffer.writeln('\n┌─── 🚀 [API REQUEST] ──────────────────────────────────────────────');
+    buffer.writeln(
+        '\n┌─── 🚀 [API REQUEST] ──────────────────────────────────────────────');
     buffer.writeln('│ Method  : ${options.method.toUpperCase()}');
     buffer.writeln('│ URL     : ${options.uri}');
-    
+
     // Headers
     if (options.headers.isNotEmpty) {
       buffer.writeln('├─ 🔑 Headers:');
@@ -49,7 +50,8 @@ class ApiLoggingInterceptor extends Interceptor {
     for (final line in curl.split('\n')) {
       buffer.writeln('│   $line');
     }
-    buffer.writeln('└───────────────────────────────────────────────────────────────────\n');
+    buffer.writeln(
+        '└───────────────────────────────────────────────────────────────────\n');
 
     _printLog(buffer.toString());
     super.onRequest(options, handler);
@@ -57,7 +59,8 @@ class ApiLoggingInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    final startTime = response.requestOptions.extra['request_start_time'] as int?;
+    final startTime =
+        response.requestOptions.extra['request_start_time'] as int?;
     final durationMs = startTime != null
         ? DateTime.now().millisecondsSinceEpoch - startTime
         : null;
@@ -66,8 +69,10 @@ class ApiLoggingInterceptor extends Interceptor {
     final statusCode = response.statusCode ?? 200;
     final statusMsg = response.statusMessage ?? 'OK';
 
-    buffer.writeln('\n┌─── ✅ [API RESPONSE $statusCode $statusMsg] ${durationMs != null ? '(${durationMs}ms)' : ''} ──────────────');
-    buffer.writeln('│ Method  : ${response.requestOptions.method.toUpperCase()}');
+    buffer.writeln(
+        '\n┌─── ✅ [API RESPONSE $statusCode $statusMsg] ${durationMs != null ? '(${durationMs}ms)' : ''} ──────────────');
+    buffer
+        .writeln('│ Method  : ${response.requestOptions.method.toUpperCase()}');
     buffer.writeln('│ URL     : ${response.requestOptions.uri}');
 
     // Response Data
@@ -80,7 +85,8 @@ class ApiLoggingInterceptor extends Interceptor {
     } else {
       buffer.writeln('├─ 📥 Response Body: (Empty)');
     }
-    buffer.writeln('└───────────────────────────────────────────────────────────────────\n');
+    buffer.writeln(
+        '└───────────────────────────────────────────────────────────────────\n');
 
     _printLog(buffer.toString());
     super.onResponse(response, handler);
@@ -97,7 +103,8 @@ class ApiLoggingInterceptor extends Interceptor {
     final statusCode = err.response?.statusCode;
     final statusMsg = err.response?.statusMessage ?? err.type.name;
 
-    buffer.writeln('\n┌─── ❌ [API ERROR ${statusCode ?? ''} $statusMsg] ${durationMs != null ? '(${durationMs}ms)' : ''} ──────────────');
+    buffer.writeln(
+        '\n┌─── ❌ [API ERROR ${statusCode ?? ''} $statusMsg] ${durationMs != null ? '(${durationMs}ms)' : ''} ──────────────');
     buffer.writeln('│ Method  : ${err.requestOptions.method.toUpperCase()}');
     buffer.writeln('│ URL     : ${err.requestOptions.uri}');
     buffer.writeln('├─ ⚠️ Error Message: ${err.message ?? 'Unknown error'}');
@@ -109,7 +116,8 @@ class ApiLoggingInterceptor extends Interceptor {
         buffer.writeln('│   $line');
       }
     }
-    buffer.writeln('└───────────────────────────────────────────────────────────────────\n');
+    buffer.writeln(
+        '└───────────────────────────────────────────────────────────────────\n');
 
     _printLog(buffer.toString());
     super.onError(err, handler);
@@ -119,7 +127,9 @@ class ApiLoggingInterceptor extends Interceptor {
     if (data == null) return 'null';
     if (data is FormData) {
       final fields = data.fields.map((f) => '${f.key}: ${f.value}').toList();
-      final files = data.files.map((f) => '${f.key}: (File: ${f.value.filename})').toList();
+      final files = data.files
+          .map((f) => '${f.key}: (File: ${f.value.filename})')
+          .toList();
       return 'FormData:\n  Fields: $fields\n  Files: $files';
     }
     if (data is Map || data is List) {
@@ -166,12 +176,16 @@ class ApiLoggingInterceptor extends Interceptor {
           components.add('-F \'${field.key}=${field.value}\'');
         }
         for (final file in formData.files) {
-          components.add('-F \'${file.key}=@${file.value.filename ?? "file"}\'');
+          components
+              .add('-F \'${file.key}=@${file.value.filename ?? "file"}\'');
         }
       } else if (options.data is Map) {
-        final isForm = options.contentType == Headers.formUrlEncodedContentType ||
-            options.headers['content-type'] == Headers.formUrlEncodedContentType ||
-            options.headers['Content-Type'] == Headers.formUrlEncodedContentType;
+        final isForm =
+            options.contentType == Headers.formUrlEncodedContentType ||
+                options.headers['content-type'] ==
+                    Headers.formUrlEncodedContentType ||
+                options.headers['Content-Type'] ==
+                    Headers.formUrlEncodedContentType;
 
         if (isForm) {
           final formStr = (options.data as Map).entries.map((e) {

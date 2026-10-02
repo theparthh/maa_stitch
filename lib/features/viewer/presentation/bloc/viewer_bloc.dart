@@ -7,8 +7,7 @@ part 'viewer_event.dart';
 part 'viewer_state.dart';
 
 class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
-  ViewerBloc({required this.repository})
-      : super(const ViewerInitial()) {
+  ViewerBloc({required this.repository}) : super(const ViewerInitial()) {
     on<LoadViewerEvent>(_onLoad);
     on<ToggleJumpStitchesEvent>(_onToggleJumpStitches);
     on<ToggleGridEvent>(_onToggleGrid);
@@ -79,7 +78,8 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
   ) {
     if (state is ViewerLoaded) {
       final current = state as ViewerLoaded;
-      if (event.colorIndex == null || current.selectedColorIndex == event.colorIndex) {
+      if (event.colorIndex == null ||
+          current.selectedColorIndex == event.colorIndex) {
         emit(current.copyWith(selectedColorIndexProvider: () => false));
       } else {
         emit(current.copyWith(selectedColorIndex: event.colorIndex));
@@ -105,10 +105,12 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
       final current = state as ViewerLoaded;
       final newIsPlaying = !current.isPlaying;
       int nextStep = current.currentStitchStep;
-      if (newIsPlaying && current.currentStitchStep >= current.design.totalStitches) {
+      if (newIsPlaying &&
+          current.currentStitchStep >= current.design.totalStitches) {
         nextStep = 0;
       }
-      emit(current.copyWith(isPlaying: newIsPlaying, currentStitchStep: nextStep));
+      emit(current.copyWith(
+          isPlaying: newIsPlaying, currentStitchStep: nextStep));
     }
   }
 

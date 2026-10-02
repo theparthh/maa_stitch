@@ -7,8 +7,7 @@ part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc({required this.repository})
-      : super(const HomeInitial()) {
+  HomeBloc({required this.repository}) : super(const HomeInitial()) {
     on<LoadHomeEvent>(_onLoad);
     on<FilterHomeEvent>(_onFilter);
     on<SearchHomeEvent>(_onSearch);
@@ -110,8 +109,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     String query,
   ) {
     return designs.where((d) {
-      final matchesFilter = filter == 'ALL' ||
-          d.extension.toUpperCase() == filter.toUpperCase();
+      final matchesFilter =
+          filter == 'ALL' || d.extension.toUpperCase() == filter.toUpperCase();
       final matchesQuery = query.isEmpty ||
           d.fileName.toLowerCase().contains(query.toLowerCase()) ||
           d.extension.toLowerCase().contains(query.toLowerCase());

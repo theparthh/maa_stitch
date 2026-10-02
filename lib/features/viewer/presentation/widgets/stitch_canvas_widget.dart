@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
@@ -26,30 +27,135 @@ class StitchCanvasWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.background,
+      color: Colors.white,
       child: ClipRect(
-        child: InteractiveViewer(
-          transformationController: transformationController,
-          boundaryMargin: const EdgeInsets.all(2000),
-          minScale: 0.05,
-          maxScale: 40.0,
-          clipBehavior: Clip.hardEdge,
-          child: Center(
-            child: CustomPaint(
-              size: Size(
-                max(design.widthMm * 4.0, 600.0),
-                max(design.heightMm * 4.0, 600.0),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return InteractiveViewer(
+              transformationController: transformationController,
+              boundaryMargin: const EdgeInsets.all(2000),
+              minScale: 0.1,
+              maxScale: 40.0,
+              clipBehavior: Clip.hardEdge,
+              child: Center(
+                child: _buildContent(constraints),
               ),
-              painter: _EmbroideryStitchPainter(
-                design: design,
-                showJumpStitches: showJumpStitches,
-                showGrid: showGrid,
-                showStitchPoints: showStitchPoints,
-                selectedColorIndex: selectedColorIndex,
-                currentStitchStep: currentStitchStep,
-              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(BoxConstraints constraints) {
+    final availableW = constraints.maxWidth.isFinite && constraints.maxWidth > 0
+        ? constraints.maxWidth
+        : 400.0;
+    final availableH = constraints.maxHeight.isFinite && constraints.maxHeight > 0
+        ? constraints.maxHeight
+        : 700.0;
+
+    final designW = design.widthMm > 0 ? design.widthMm : 240.0;
+    final designH = design.heightMm > 0 ? design.heightMm : 480.0;
+    final aspect = designW / designH;
+
+    // Full HD viewport-aware sizing: fits design completely on initial open
+    final maxAllowedW = availableW * 0.94;
+    final maxAllowedH = availableH * 0.85;
+
+    double displayW;
+    double displayH;
+    if (maxAllowedW / maxAllowedH < aspect) {
+      displayW = maxAllowedW;
+      displayH = displayW / aspect;
+    } else {
+      displayH = maxAllowedH;
+      displayW = displayH * aspect;
+    }
+
+    displayW = max(displayW, 300.0);
+    displayH = max(displayH, 300.0);
+
+    if (design.previewImagePath != null &&
+        design.previewImagePath!.isNotEmpty) {
+      final isAsset = design.previewImagePath!.startsWith('assets/');
+      return Container(
+        width: displayW,
+        height: displayH,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
             ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: isAsset
+            ? Image.asset(
+                design.previewImagePath!,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+              )
+            : Image.file(
+                File(design.previewImagePath!),
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+              ),
+      );
+    }
+
+    if (design.previewImageBytes != null &&
+        design.previewImageBytes!.isNotEmpty) {
+      return Container(
+        width: displayW,
+        height: displayH,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Image.memory(
+          design.previewImageBytes!,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+        ),
+      );
+    }
+
+    return Container(
+      width: displayW,
+      height: displayH,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
+        ],
+      ),
+      child: CustomPaint(
+        size: Size(displayW, displayH),
+        painter: _EmbroideryStitchPainter(
+          design: design,
+          showJumpStitches: showJumpStitches,
+          showGrid: showGrid,
+          showStitchPoints: showStitchPoints,
+          selectedColorIndex: selectedColorIndex,
+          currentStitchStep: currentStitchStep,
         ),
       ),
     );
@@ -76,8 +182,6 @@ class _EmbroideryStitchPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final maxDim = max(design.widthMm, design.heightMm);
-    final scale = maxDim > 400.0 ? (400.0 / maxDim) * 2.5 : 2.5;
 
     if (design.stitches.isEmpty) return;
 
@@ -91,6 +195,11 @@ class _EmbroideryStitchPainter extends CustomPainter {
     }
     final midX = (minX + maxX) / 2.0;
     final midY = (minY + maxY) / 2.0;
+
+    final stitchW = max((maxX - minX).abs(), 1.0);
+    final stitchH = max((maxY - minY).abs(), 1.0);
+    final scale = min((size.width * 0.90) / stitchW, (size.height * 0.90) / stitchH);
+
     final centerShift = center - Offset(midX * scale, midY * scale);
 
     // 2. Draw Grid Overlay
@@ -108,14 +217,19 @@ class _EmbroideryStitchPainter extends CustomPainter {
       final currentOffset = centerShift + Offset(p.x * scale, p.y * scale);
 
       if (prevPoint != null) {
-        final prevOffset = centerShift + Offset(prevPoint.x * scale, prevPoint.y * scale);
+        final prevOffset =
+            centerShift + Offset(prevPoint.x * scale, prevPoint.y * scale);
         final colorIndex = p.colorIndex % AppColors.defaultThreadPalette.length;
         final color = AppColors.defaultThreadPalette[colorIndex];
 
         final isColorSelected =
             selectedColorIndex == null || selectedColorIndex == colorIndex;
 
-        if (p.type == StitchType.jump || prevPoint.type == StitchType.jump) {
+        final dxMm = (p.x - prevPoint.x).abs();
+        final dyMm = (p.y - prevPoint.y).abs();
+        final isTransit = p.type == StitchType.jump || dxMm > 12.1 || dyMm > 12.1;
+
+        if (isTransit) {
           if (showJumpStitches && isColorSelected) {
             _drawDashedLine(
               canvas,
@@ -129,11 +243,10 @@ class _EmbroideryStitchPainter extends CustomPainter {
           }
         } else if (p.type == StitchType.normal) {
           final threadPaint = Paint()
-            ..color = isColorSelected
-                ? color
-                : color.withValues(alpha: 0.12)
+            ..color = isColorSelected ? color : color.withValues(alpha: 0.12)
             ..strokeWidth = isColorSelected ? 2.2 : 1.0
             ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
             ..style = PaintingStyle.stroke;
 
           canvas.drawLine(prevOffset, currentOffset, threadPaint);

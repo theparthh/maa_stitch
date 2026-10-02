@@ -8,5 +8,6 @@ void main() async {
 
   await initDependencies();
   AppRouteHandler.route = AppRouter();
+  AppRouteHandler.initFileIntentListener();
   runApp(const ViewStitchApp());
 }

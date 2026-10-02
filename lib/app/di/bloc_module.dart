@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:maa_design_stitch_viewer/features/auth/auth.dart';
 import 'package:maa_design_stitch_viewer/features/home/home.dart';
+import 'package:maa_design_stitch_viewer/features/reference_files/reference_files.dart';
 import 'package:maa_design_stitch_viewer/features/splash/splash.dart';
 import 'package:maa_design_stitch_viewer/features/viewer/viewer.dart';
 
@@ -23,6 +24,10 @@ void registerBlocs(GetIt getIt) {
 
   getIt.registerFactory<ViewerBloc>(
     () => ViewerBloc(repository: getIt<ViewerRepository>()),
+  );
+
+  getIt.registerFactory<FolderBrowserBloc>(
+    () => FolderBrowserBloc(repository: getIt<ReferenceFilesRepository>()),
   );
 }
 

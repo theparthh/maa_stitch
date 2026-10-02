@@ -8,73 +8,13 @@ class PhoneLoginHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Brand Logo Container with Glow & Gradient
         Hero(
           tag: 'auth_brand_icon',
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: AppSize.size80,
-                height: AppSize.size80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                ),
-              ),
-              Container(
-                width: AppSize.size72,
-                height: AppSize.size72,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      AppColors.primaryDark,
-                      AppColors.primary,
-                      AppColors.secondary,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: AppBorderRadius.borderRadius24,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.35),
-                      blurRadius: AppSize.size20,
-                      offset: const Offset(0, AppSize.size10),
-                    ),
-                    BoxShadow(
-                      color: AppColors.secondary.withValues(alpha: 0.2),
-                      blurRadius: AppSize.size10,
-                      offset: const Offset(0, AppSize.size4),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.grid_4x4_rounded,
-                        size: AppSize.size32,
-                        color: AppColors.white.withValues(alpha: 0.9),
-                      ),
-                      Positioned(
-                        right: AppSize.size14,
-                        bottom: AppSize.size14,
-                        child: Container(
-                          width: AppSize.size8,
-                          height: AppSize.size8,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.blueLight,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          child: Image.asset(
+            AppAssets.appLogo,
+            width: AppSize.size80,
+            height: AppSize.size80,
+            fit: BoxFit.contain,
           ),
         ),
         AppGaps.gap20,

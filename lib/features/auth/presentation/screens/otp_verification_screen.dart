@@ -244,8 +244,8 @@ class _OtpVerificationContentState extends State<_OtpVerificationContent>
                     ),
                   ),
                 );
-                // Navigate to Home screen
-                AppRouteHandler.route.replace(const HomeRoute());
+                // Clear navigation stack and enter Home screen
+                AppRouteHandler.route.replaceAll([const HomeRoute()]);
               }
             },
             builder: (context, state) {

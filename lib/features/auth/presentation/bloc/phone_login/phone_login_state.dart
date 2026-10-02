@@ -36,7 +36,13 @@ final class PhoneLoginSubmitting extends PhoneLoginState {
 final class PhoneLoginSuccess extends PhoneLoginState {
   const PhoneLoginSuccess({
     required super.phoneNumber,
+    this.message,
   }) : super(isValid: true);
+
+  final String? message;
+
+  @override
+  List<Object?> get props => [phoneNumber, isValid, errorMessage, message];
 }
 
 final class PhoneLoginFailure extends PhoneLoginState {

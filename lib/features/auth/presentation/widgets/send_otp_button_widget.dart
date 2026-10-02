@@ -82,7 +82,8 @@ class SendOtpButtonWidget extends StatelessWidget {
                       Text(
                         'Get Verification Code',
                         style: AppTextStyles.bodyLarge.copyWith(
-                          color: isEnabled ? AppColors.white : AppColors.textMuted,
+                          color:
+                              isEnabled ? AppColors.white : AppColors.textMuted,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.4,
                         ),
@@ -91,7 +92,8 @@ class SendOtpButtonWidget extends StatelessWidget {
                       Icon(
                         Icons.arrow_forward_rounded,
                         size: AppSize.size20,
-                        color: isEnabled ? AppColors.white : AppColors.textMuted,
+                        color:
+                            isEnabled ? AppColors.white : AppColors.textMuted,
                       ),
                     ],
                   ),

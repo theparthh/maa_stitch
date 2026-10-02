@@ -5,6 +5,7 @@ import 'package:maa_design_stitch_viewer/app/core/core.dart';
 import 'package:maa_design_stitch_viewer/app/router/app_route_handler.dart';
 import 'package:maa_design_stitch_viewer/app/router/app_router.dart';
 import 'package:maa_design_stitch_viewer/features/home/presentation/bloc/bloc.dart';
+import 'package:maa_design_stitch_viewer/features/home/presentation/widgets/home_header_widget.dart';
 
 class HomeViewWidget extends StatelessWidget {
   const HomeViewWidget({super.key});
@@ -14,7 +15,8 @@ class HomeViewWidget extends StatelessWidget {
     return BlocConsumer<HomeBloc, HomeState>(
       listener: (context, state) {
         if (state is HomeLoaded && state.openedFilePath != null) {
-          AppRouteHandler.route.push(ViewerRoute(filePath: state.openedFilePath!));
+          AppRouteHandler.route
+              .push(ViewerRoute(filePath: state.openedFilePath!));
         }
       },
       builder: (context, state) {
@@ -42,6 +44,8 @@ class HomeViewWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      const HomeHeaderWidget(),
+                      AppGaps.gap20,
                       // Main Hero Action Card (File Opener)
                       Container(
                         padding: const EdgeInsets.all(AppSize.size24),
@@ -69,8 +73,10 @@ class HomeViewWidget extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(AppSize.size12),
                                   decoration: BoxDecoration(
-                                    color: AppColors.white.withValues(alpha: 0.12),
-                                    borderRadius: AppBorderRadius.borderRadius16,
+                                    color:
+                                        AppColors.white.withValues(alpha: 0.12),
+                                    borderRadius:
+                                        AppBorderRadius.borderRadius16,
                                   ),
                                   child: const Icon(
                                     Icons.folder_open_rounded,
@@ -111,13 +117,16 @@ class HomeViewWidget extends StatelessWidget {
                               height: AppSize.size52,
                               child: ElevatedButton.icon(
                                 onPressed: () {
-                                  context.read<HomeBloc>().add(const PickFileHomeEvent());
+                                  context
+                                      .read<HomeBloc>()
+                                      .add(const PickFileHomeEvent());
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.white,
                                   foregroundColor: AppColors.primary,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: AppBorderRadius.borderRadius14,
+                                    borderRadius:
+                                        AppBorderRadius.borderRadius14,
                                   ),
                                   elevation: 0,
                                 ),
@@ -139,6 +148,9 @@ class HomeViewWidget extends StatelessWidget {
                           ],
                         ),
                       ),
+                      AppGaps.gap16,
+                      // ── Reference Files Card ──
+                      const _ReferenceFilesCard(),
                     ],
                   ),
                 ),
@@ -167,6 +179,97 @@ class HomeViewWidget extends StatelessWidget {
         style: AppTextStyles.caption.copyWith(
           color: AppColors.white,
           fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class _ReferenceFilesCard extends StatelessWidget {
+  const _ReferenceFilesCard();
+
+  /// Base directory — the project/app root where reference folders live.
+  /// Stored in one place; no folder names are referenced here.
+  static const String _baseDir =
+      '/Users/theparth/Desktop/maa_design_stitch_viewer';
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        borderRadius: AppBorderRadius.borderRadius20,
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: AppSize.size16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: AppColors.transparent,
+        borderRadius: AppBorderRadius.borderRadius20,
+        child: InkWell(
+          onTap: () {
+            AppRouteHandler.route.push(
+              FolderBrowserRoute(
+                baseDirectoryPath: _baseDir,
+                title: 'Reference Files',
+              ),
+            );
+          },
+          borderRadius: AppBorderRadius.borderRadius20,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSize.size20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSize.size14),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.secondary],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: AppBorderRadius.borderRadius16,
+                  ),
+                  child: const Icon(
+                    Icons.folder_special_rounded,
+                    color: AppColors.white,
+                    size: AppSize.size28,
+                  ),
+                ),
+                AppGaps.gap16,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Reference Files',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      AppGaps.gap4,
+                      Text(
+                        'Browse design files, images & output references',
+                        style: AppTextStyles.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+                AppGaps.gap8,
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.textMuted,
+                  size: AppSize.size24,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

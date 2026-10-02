@@ -10,9 +10,12 @@ class StitchStatsBottomSheetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final jumpCount = design.stitches.where((s) => s.type == StitchType.jump).length;
-    final normalCount = design.stitches.where((s) => s.type == StitchType.normal).length;
-    final estimatedThreadMeters = (normalCount * 4.5) / 1000.0; // ~4.5mm per stitch avg
+    final jumpCount =
+        design.stitches.where((s) => s.type == StitchType.jump).length;
+    final normalCount =
+        design.stitches.where((s) => s.type == StitchType.normal).length;
+    final estimatedThreadMeters =
+        (normalCount * 4.5) / 1000.0; // ~4.5mm per stitch avg
 
     return Container(
       padding: const EdgeInsets.all(AppSize.size24),
@@ -37,12 +40,14 @@ class StitchStatsBottomSheetWidget extends StatelessWidget {
           AppGaps.gap16,
           Text(
             'Embroidery Design Statistics',
-            style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+            style: AppTextStyles.h3.copyWith(
+                color: AppColors.textPrimary, fontWeight: FontWeight.bold),
           ),
           AppGaps.gap4,
           Text(
             design.fileName,
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+            style: AppTextStyles.bodyMedium
+                .copyWith(color: AppColors.textSecondary),
           ),
           AppGaps.gap20,
           GridView.count(
@@ -65,7 +70,8 @@ class StitchStatsBottomSheetWidget extends StatelessWidget {
               ),
               StatItemWidget(
                 title: 'Width × Height',
-                value: '${design.widthMm.toStringAsFixed(1)} × ${design.heightMm.toStringAsFixed(1)} mm',
+                value:
+                    '${design.widthMm.toStringAsFixed(1)} × ${design.heightMm.toStringAsFixed(1)} mm',
                 icon: Icons.aspect_ratio_rounded,
               ),
               StatItemWidget(

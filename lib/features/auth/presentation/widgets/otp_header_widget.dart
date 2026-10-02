@@ -68,11 +68,13 @@ class OtpHeaderWidget extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSize.size8, vertical: AppSize.size2),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.size8, vertical: AppSize.size2),
               decoration: BoxDecoration(
                 color: AppColors.primaryLight,
                 borderRadius: AppBorderRadius.borderRadius6,
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                border:
+                    Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
               ),
               child: Text(
                 phoneNumber,

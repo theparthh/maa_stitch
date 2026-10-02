@@ -6,8 +6,7 @@ part 'splash_event.dart';
 part 'splash_state.dart';
 
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
-  SplashBloc({required this.repository})
-      : super(const SplashInitial()) {
+  SplashBloc({required this.repository}) : super(const SplashInitial()) {
     on<InitSplashEvent>(_onInit);
   }
 
@@ -20,9 +19,16 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     emit(const SplashLoading());
     try {
       final initialFilePath = await repository.checkInitialFileIntent();
-      emit(SplashCompleted(initialFilePath: initialFilePath));
+      final isAuth = repository.isAuthenticated;
+      emit(SplashCompleted(
+        initialFilePath: initialFilePath,
+        isAuthenticated: isAuth,
+      ));
     } catch (_) {
-      emit(const SplashCompleted(initialFilePath: null));
+      emit(SplashCompleted(
+        initialFilePath: null,
+        isAuthenticated: repository.isAuthenticated,
+      ));
     }
   }
 }

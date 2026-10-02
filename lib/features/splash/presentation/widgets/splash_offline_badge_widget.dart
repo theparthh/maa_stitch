@@ -7,11 +7,14 @@ class SplashOfflineBadgeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSize.size16, vertical: AppSize.size8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.size16, vertical: AppSize.size8),
       decoration: BoxDecoration(
         color: AppColors.primaryLight,
         borderRadius: AppBorderRadius.borderRadius20,
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15), width: AppSize.size1),
+        border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.15),
+            width: AppSize.size1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

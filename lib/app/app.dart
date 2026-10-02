@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
 import 'package:maa_design_stitch_viewer/app/router/router.dart';
@@ -11,7 +12,14 @@ class ViewStitchApp extends StatelessWidget {
       title: 'View Stitch',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      routerConfig: AppRouteHandler.route.config(),
+      routerConfig: AppRouteHandler.route.config(
+        deepLinkBuilder: (deepLink) {
+          if (!deepLink.isValid) {
+            return const DeepLink([SplashRoute()]);
+          }
+          return deepLink;
+        },
+      ),
     );
   }
 }

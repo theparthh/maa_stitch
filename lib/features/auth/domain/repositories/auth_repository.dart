@@ -3,11 +3,11 @@ import 'package:maa_design_stitch_viewer/app/core/network/api_exception.dart';
 import 'package:maa_design_stitch_viewer/features/auth/domain/models/models.dart';
 
 abstract class AuthRepository {
-  Future<Either<ApiException, bool>> sendOtp({
+  Future<Either<ApiException, String>> sendOtp({
     required String phoneNumber,
   });
 
-  Future<Either<ApiException, bool>> resendOtp({
+  Future<Either<ApiException, String>> resendOtp({
     required String phoneNumber,
   });
 
@@ -15,4 +15,8 @@ abstract class AuthRepository {
     required String phoneNumber,
     required String otp,
   });
+
+  bool get isLoggedIn;
+  String? get token;
+  String? get phoneNumber;
 }

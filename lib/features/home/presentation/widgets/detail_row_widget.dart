@@ -21,7 +21,8 @@ class DetailRowWidget extends StatelessWidget {
         AppGaps.gap12,
         Text(
           label,
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+          style:
+              AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
         ),
         const Spacer(),
         Flexible(

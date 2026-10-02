@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:maa_design_stitch_viewer/app/models/stitch_point_model.dart';
@@ -16,6 +17,8 @@ class EmbroideryDesign extends Equatable {
     required this.stitches,
     required this.lastOpened,
     this.description,
+    this.previewImageBytes,
+    this.previewImagePath,
   });
 
   final String id;
@@ -30,6 +33,8 @@ class EmbroideryDesign extends Equatable {
   final List<StitchPoint> stitches;
   final DateTime lastOpened;
   final String? description;
+  final Uint8List? previewImageBytes;
+  final String? previewImagePath;
 
   @override
   List<Object?> get props => [
@@ -45,6 +50,8 @@ class EmbroideryDesign extends Equatable {
         stitches,
         lastOpened,
         description,
+        previewImageBytes,
+        previewImagePath,
       ];
 
   EmbroideryDesign copyWith({
@@ -60,6 +67,8 @@ class EmbroideryDesign extends Equatable {
     List<StitchPoint>? stitches,
     DateTime? lastOpened,
     String? description,
+    Uint8List? previewImageBytes,
+    String? previewImagePath,
   }) {
     return EmbroideryDesign(
       id: id ?? this.id,
@@ -74,6 +83,8 @@ class EmbroideryDesign extends Equatable {
       stitches: stitches ?? this.stitches,
       lastOpened: lastOpened ?? this.lastOpened,
       description: description ?? this.description,
+      previewImageBytes: previewImageBytes ?? this.previewImageBytes,
+      previewImagePath: previewImagePath ?? this.previewImagePath,
     );
   }
 }

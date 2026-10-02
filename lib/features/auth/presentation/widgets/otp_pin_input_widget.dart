@@ -70,9 +70,8 @@ class OtpPinInputWidget extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(6, (index) {
-                      final digit = index < currentText.length
-                          ? currentText[index]
-                          : '';
+                      final digit =
+                          index < currentText.length ? currentText[index] : '';
                       final isBoxFocused =
                           isFocused && index == currentText.length.clamp(0, 5);
                       final isFilled = digit.isNotEmpty;
@@ -88,8 +87,7 @@ class OtpPinInputWidget extends StatelessWidget {
                       } else if (isFilled) {
                         borderColor =
                             AppColors.secondary.withValues(alpha: 0.6);
-                        bgColor =
-                            AppColors.primaryLight.withValues(alpha: 0.5);
+                        bgColor = AppColors.primaryLight.withValues(alpha: 0.5);
                       }
 
                       return Expanded(

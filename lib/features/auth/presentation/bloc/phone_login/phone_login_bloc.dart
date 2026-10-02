@@ -92,9 +92,10 @@ class PhoneLoginBloc extends Bloc<PhoneLoginEvent, PhoneLoginState> {
           errorMessage: failure.message,
         ),
       ),
-      (_) => emit(
+      (msg) => emit(
         PhoneLoginSuccess(
           phoneNumber: state.phoneNumber,
+          message: msg,
         ),
       ),
     );

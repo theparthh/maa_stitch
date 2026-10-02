@@ -38,7 +38,8 @@ class DioClient {
       if (response.data != null) {
         return right(response.data!);
       }
-      return left(const ApiException(message: 'Null response data received from server'));
+      return left(const ApiException(
+          message: 'Null response data received from server'));
     } on DioException catch (e) {
       String errorMessage = 'Server connection failed. Please try again.';
       int? statusCode = e.response?.statusCode;
@@ -56,7 +57,8 @@ class DioClient {
 
       return left(ApiException(message: errorMessage, statusCode: statusCode));
     } catch (e) {
-      return left(ApiException(message: e.toString().replaceAll('Exception: ', '')));
+      return left(
+          ApiException(message: e.toString().replaceAll('Exception: ', '')));
     }
   }
 }

@@ -6,8 +6,7 @@ class FileHandlerService {
   Future<String?> pickEmbroideryFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['dst', 'emb', 'dhp', 'DST', 'EMB', 'DHP'],
+        type: FileType.any,
       );
 
       if (result != null && result.files.isNotEmpty) {

@@ -28,7 +28,8 @@ class EmptyStateWidget extends StatelessWidget {
             Text(
               'No embroidery files match your active search or extension filter.',
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+              style: AppTextStyles.bodyMedium
+                  .copyWith(color: AppColors.textSecondary),
             ),
             AppGaps.gap20,
             OutlinedButton(

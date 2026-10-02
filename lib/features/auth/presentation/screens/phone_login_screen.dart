@@ -158,6 +158,37 @@ class _PhoneLoginContentState extends State<_PhoneLoginContent>
                   ),
                 );
               } else if (state is PhoneLoginSuccess) {
+                if (state.message != null && state.message!.isNotEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(
+                            Icons.check_circle_outline_rounded,
+                            color: AppColors.white,
+                            size: 20,
+                          ),
+                          AppGaps.gap12,
+                          Expanded(
+                            child: Text(
+                              state.message!,
+                              style: const TextStyle(
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: AppColors.primary,
+                      behavior: SnackBarBehavior.floating,
+                      margin: const EdgeInsets.all(AppSize.size16),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: AppBorderRadius.borderRadius12,
+                      ),
+                    ),
+                  );
+                }
                 AppRouteHandler.route.push(
                   OtpVerificationRoute(phoneNumber: state.phoneNumber),
                 );
