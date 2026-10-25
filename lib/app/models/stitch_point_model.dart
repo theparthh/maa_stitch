@@ -1,5 +1,3 @@
-import 'package:equatable/equatable.dart';
-
 enum StitchType {
   normal,
   jump,
@@ -8,7 +6,11 @@ enum StitchType {
   end,
 }
 
-class StitchPoint extends Equatable {
+/// A single needle position in millimetres (+X right, +Y down).
+///
+/// Intentionally not `Equatable`: designs hold 50k+ points and value-equality
+/// on every state change made the viewer slow.
+class StitchPoint {
   const StitchPoint({
     required this.x,
     required this.y,
@@ -19,8 +21,8 @@ class StitchPoint extends Equatable {
   final double x;
   final double y;
   final StitchType type;
-  final int colorIndex;
 
-  @override
-  List<Object?> get props => [x, y, type, colorIndex];
+  /// Index into [EmbroideryDesign.threads]; the entry's style says whether
+  /// this position is thread, a bead line or a dropped sequin.
+  final int colorIndex;
 }

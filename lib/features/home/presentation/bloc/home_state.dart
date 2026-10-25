@@ -22,6 +22,7 @@ final class HomeLoaded extends HomeState {
     required this.activeFilter,
     required this.searchQuery,
     this.openedFilePath,
+    this.openRequest = 0,
   });
 
   final List<EmbroideryDesign> allDesigns;
@@ -30,6 +31,10 @@ final class HomeLoaded extends HomeState {
   final String searchQuery;
   final String? openedFilePath;
 
+  /// Incremented on every pick so the same file can be opened twice and
+  /// unrelated state changes never re-open the viewer.
+  final int openRequest;
+
   @override
   List<Object?> get props => [
         allDesigns,
@@ -37,6 +42,7 @@ final class HomeLoaded extends HomeState {
         activeFilter,
         searchQuery,
         openedFilePath,
+        openRequest,
       ];
 
   HomeLoaded copyWith({
@@ -45,6 +51,7 @@ final class HomeLoaded extends HomeState {
     String? activeFilter,
     String? searchQuery,
     String? openedFilePath,
+    int? openRequest,
   }) {
     return HomeLoaded(
       allDesigns: allDesigns ?? this.allDesigns,
@@ -52,6 +59,7 @@ final class HomeLoaded extends HomeState {
       activeFilter: activeFilter ?? this.activeFilter,
       searchQuery: searchQuery ?? this.searchQuery,
       openedFilePath: openedFilePath ?? this.openedFilePath,
+      openRequest: openRequest ?? this.openRequest,
     );
   }
 }

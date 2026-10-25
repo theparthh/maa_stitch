@@ -44,23 +44,82 @@ abstract class AppColors {
   static const Color pinBorderFocused = Color(0xff0f2b5c);
   static const Color pinBg = Color(0xfff8fafc);
 
-  // Embroidery Thread Color Palette Defaults (Exact Commercial Embroidery Match)
+  // Default colours for DST colour blocks (DST stores no colours).
   static const List<Color> defaultThreadPalette = [
-    Color(0xff5036b1), // 0: Royal Sapphire Blue (Top-Right Flowers)
-    Color(0xff539943), // 1: Emerald Leaf Green (Top-Left Flowers)
-    Color(0xffc82323), // 2: Crimson Red (Vines, Leaves & Border)
-    Color(0xff00bcd4), // 3: Vibrant Cyan / Turquoise (Pearls & Discs)
-    Color(0xffece23c), // 4: Warm Gold / Yellow (Inner Dots)
-    Color(0xffa72d9e), // 5: Royal Purple / Magenta (V-Neck Collar)
-    Color(0xffe91e63), // 6: Rose Pink
-    Color(0xffea580c), // 7: Sunset Orange
-    Color(0xff0f2b5c), // 8: Deep Midnight Navy
-    Color(0xff8e24aa), // 9: Deep Violet
-    Color(0xff00897b), // 10: Teal Green
-    Color(0xfffdd835), // 11: Sunflower Yellow
-    Color(0xff4f46e5), // 12: Indigo Silk
-    Color(0xff78350f), // 13: Warm Chocolate
-    Color(0xffb91c1c), // 14: Ruby Garnet
-    Color(0xff64748b), // Slate Grey
+    Color(0xffc62828), // Red
+    Color(0xff2e7d32), // Green
+    Color(0xff1e3a8a), // Royal Blue
+    Color(0xffd81b60), // Magenta
+    Color(0xffe6b800), // Gold Yellow
+    Color(0xff00acc1), // Turquoise
+    Color(0xff6a1b9a), // Purple
+    Color(0xffef6c00), // Orange
+    Color(0xff5d4037), // Brown
+    Color(0xff616161), // Grey
+    Color(0xffec407a), // Pink
+    Color(0xff00796b), // Teal
+    Color(0xff283593), // Indigo
+    Color(0xff827717), // Olive
+    Color(0xff212121), // Black
+  ];
+
+  /// Default for Dahao bead / cord lines.
+  static const Color beadDefault = Color(0xffe0592a);
+
+  // Needle defaults chosen to match Dahao's own screen colours for the
+  // reference designs (needle 1 green satin, needle 2 red, …).
+  static const List<Color> _needleDefaults = [
+    Color(0xff2e7d32), // 1 Green
+    Color(0xffc62828), // 2 Red
+    Color(0xff1e3a8a), // 3 Royal Blue
+    Color(0xffef6c00), // 4 Orange
+    Color(0xffd81b60), // 5 Magenta
+    Color(0xff6a1b9a), // 6 Purple
+    Color(0xff00acc1), // 7 Turquoise
+    Color(0xffe6b800), // 8 Gold Yellow
+    Color(0xff5d4037), // 9 Brown
+    Color(0xff616161), // 10 Grey
+    Color(0xffec407a), // 11 Pink
+    Color(0xff00796b), // 12 Teal
+  ];
+
+  /// Default colour for Dahao needle [needle] (1-based).
+  static Color needleColor(int needle) =>
+      _needleDefaults[(needle - 1).abs() % _needleDefaults.length];
+
+  // Device codes seen in Dahao files and the colours Dahao showed for them.
+  static const Map<int, Color> _sequinByCode = {
+    6: Color(0xffb8c4cc), // silver rows
+    8: Color(0xff1e3fd0), // single blue sequins
+    0x100: Color(0xff1e3fd0), // blue
+    0x1000: Color(0xffe91e8c), // pink
+  };
+
+  static const List<Color> _sequinDefaults = [
+    Color(0xff1e3fd0), // Royal blue
+    Color(0xffe91e8c), // Pink
+    Color(0xffb8c4cc), // Silver
+    Color(0xffd4af37), // Gold
+    Color(0xff7b1fa2), // Purple
+  ];
+
+  /// Default colour for a sequin device with flag [code], the [n]th seen.
+  static Color sequinColor(int code, int n) =>
+      _sequinByCode[code] ?? _sequinDefaults[n % _sequinDefaults.length];
+
+  /// Swatches offered in the thread colour picker.
+  static const List<Color> threadSwatches = [
+    Color(0xffffffff), Color(0xfff5f0e1), Color(0xffbdbdbd), Color(0xff757575),
+    Color(0xff212121), Color(0xff000000), Color(0xfffff176), Color(0xffffd600),
+    Color(0xffe6b800), Color(0xffffa000), Color(0xffef6c00), Color(0xffff7043),
+    Color(0xffff8a80), Color(0xffe53935), Color(0xffc62828), Color(0xff8e0000),
+    Color(0xfff8bbd0), Color(0xfff06292), Color(0xffec407a), Color(0xffd81b60),
+    Color(0xffad1457), Color(0xffce93d8), Color(0xffab47bc), Color(0xff6a1b9a),
+    Color(0xffb39ddb), Color(0xff5e35b1), Color(0xff283593), Color(0xff1e3a8a),
+    Color(0xff1565c0), Color(0xff42a5f5), Color(0xff90caf9), Color(0xff00acc1),
+    Color(0xff80deea), Color(0xff00796b), Color(0xff4db6ac), Color(0xffa5d6a7),
+    Color(0xff66bb6a), Color(0xff2e7d32), Color(0xff1b5e20), Color(0xffc0ca33),
+    Color(0xff827717), Color(0xffd7ccc8), Color(0xffa1887f), Color(0xff6d4c41),
+    Color(0xff5d4037), Color(0xff3e2723), Color(0xffd4af37), Color(0xffc0c0c0),
   ];
 }

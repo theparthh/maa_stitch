@@ -1,326 +1,205 @@
-import 'dart:io';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
 import 'package:maa_design_stitch_viewer/app/models/models.dart';
+import 'package:maa_design_stitch_viewer/features/viewer/presentation/rendering/stitch_renderer.dart';
 
-class StitchCanvasWidget extends StatelessWidget {
+/// Pan/zoom vector view of decoded stitches.
+///
+/// The design is fitted to the viewport and drawn in millimetre space, so it
+/// stays sharp at any zoom (up to [maxZoom]× the fitted size).
+class StitchCanvasWidget extends StatefulWidget {
   const StitchCanvasWidget({
     super.key,
     required this.design,
-    required this.showJumpStitches,
+    required this.style,
     required this.showGrid,
-    required this.showStitchPoints,
-    required this.selectedColorIndex,
     required this.currentStitchStep,
     required this.transformationController,
   });
 
   final EmbroideryDesign design;
-  final bool showJumpStitches;
+  final StitchRenderStyle style;
   final bool showGrid;
-  final bool showStitchPoints;
-  final int? selectedColorIndex;
   final int currentStitchStep;
   final TransformationController transformationController;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: ClipRect(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return InteractiveViewer(
-              transformationController: transformationController,
-              boundaryMargin: const EdgeInsets.all(2000),
-              minScale: 0.1,
-              maxScale: 40.0,
-              clipBehavior: Clip.hardEdge,
-              child: Center(
-                child: _buildContent(constraints),
-              ),
-            );
-          },
-        ),
-      ),
-    );
+  static const double maxZoom = 80;
+  static const double fitPadding = 24;
+
+  /// Zooms by [factor] keeping [focalPoint] (viewport coords) fixed.
+  static void zoomAround(
+    TransformationController controller,
+    double factor,
+    Offset focalPoint,
+  ) {
+    final current = controller.value.getMaxScaleOnAxis();
+    final target = (current * factor).clamp(1.0, maxZoom);
+    final f = target / current;
+    controller.value = Matrix4.identity()
+      ..translateByDouble(focalPoint.dx, focalPoint.dy, 0, 1)
+      ..scaleByDouble(f, f, 1, 1)
+      ..translateByDouble(-focalPoint.dx, -focalPoint.dy, 0, 1)
+      ..multiply(controller.value);
   }
 
-  Widget _buildContent(BoxConstraints constraints) {
-    final availableW = constraints.maxWidth.isFinite && constraints.maxWidth > 0
-        ? constraints.maxWidth
-        : 400.0;
-    final availableH = constraints.maxHeight.isFinite && constraints.maxHeight > 0
-        ? constraints.maxHeight
-        : 700.0;
+  @override
+  State<StitchCanvasWidget> createState() => _StitchCanvasWidgetState();
+}
 
-    final designW = design.widthMm > 0 ? design.widthMm : 240.0;
-    final designH = design.heightMm > 0 ? design.heightMm : 480.0;
-    final aspect = designW / designH;
+class _StitchCanvasWidgetState extends State<StitchCanvasWidget> {
+  late StitchRenderer _renderer = StitchRenderer(widget.design);
+  Offset _doubleTapPosition = Offset.zero;
 
-    // Full HD viewport-aware sizing: fits design completely on initial open
-    final maxAllowedW = availableW * 0.94;
-    final maxAllowedH = availableH * 0.85;
+  @override
+  void didUpdateWidget(covariant StitchCanvasWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Colour edits produce a new design object with the same stitches.
+    if (!identical(oldWidget.design.stitches, widget.design.stitches)) {
+      _renderer.dispose();
+      _renderer = StitchRenderer(widget.design);
+    }
+  }
 
-    double displayW;
-    double displayH;
-    if (maxAllowedW / maxAllowedH < aspect) {
-      displayW = maxAllowedW;
-      displayH = displayW / aspect;
+  @override
+  void dispose() {
+    _renderer.dispose();
+    super.dispose();
+  }
+
+  void _onDoubleTap() {
+    final c = widget.transformationController;
+    if (c.value.getMaxScaleOnAxis() > 1.05) {
+      c.value = Matrix4.identity();
     } else {
-      displayH = maxAllowedH;
-      displayW = displayH * aspect;
+      StitchCanvasWidget.zoomAround(c, 4, _doubleTapPosition);
     }
+  }
 
-    displayW = max(displayW, 300.0);
-    displayH = max(displayH, 300.0);
-
-    if (design.previewImagePath != null &&
-        design.previewImagePath!.isNotEmpty) {
-      final isAsset = design.previewImagePath!.startsWith('assets/');
-      return Container(
-        width: displayW,
-        height: displayH,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: isAsset
-            ? Image.asset(
-                design.previewImagePath!,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
-              )
-            : Image.file(
-                File(design.previewImagePath!),
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppColors.white,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = constraints.biggest;
+          return GestureDetector(
+            onDoubleTapDown: (d) => _doubleTapPosition = d.localPosition,
+            onDoubleTap: _onDoubleTap,
+            child: InteractiveViewer(
+              transformationController: widget.transformationController,
+              minScale: 1,
+              maxScale: StitchCanvasWidget.maxZoom,
+              boundaryMargin: EdgeInsets.all(size.shortestSide * 0.5),
+              child: SizedBox.fromSize(
+                size: size,
+                child: RepaintBoundary(
+                  child: CustomPaint(
+                    painter: _StitchPainter(
+                      renderer: _renderer,
+                      style: widget.style,
+                      showGrid: widget.showGrid,
+                      limit: widget.currentStitchStep,
+                      transform: widget.transformationController,
+                    ),
+                  ),
+                ),
               ),
-      );
-    }
-
-    if (design.previewImageBytes != null &&
-        design.previewImageBytes!.isNotEmpty) {
-      return Container(
-        width: displayW,
-        height: displayH,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
             ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Image.memory(
-          design.previewImageBytes!,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
-        ),
-      );
-    }
-
-    return Container(
-      width: displayW,
-      height: displayH,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: CustomPaint(
-        size: Size(displayW, displayH),
-        painter: _EmbroideryStitchPainter(
-          design: design,
-          showJumpStitches: showJumpStitches,
-          showGrid: showGrid,
-          showStitchPoints: showStitchPoints,
-          selectedColorIndex: selectedColorIndex,
-          currentStitchStep: currentStitchStep,
-        ),
+          );
+        },
       ),
     );
   }
 }
 
-class _EmbroideryStitchPainter extends CustomPainter {
-  _EmbroideryStitchPainter({
-    required this.design,
-    required this.showJumpStitches,
+class _StitchPainter extends CustomPainter {
+  _StitchPainter({
+    required this.renderer,
+    required this.style,
     required this.showGrid,
-    required this.showStitchPoints,
-    required this.selectedColorIndex,
-    required this.currentStitchStep,
-  });
+    required this.limit,
+    required this.transform,
+  }) : super(repaint: transform);
 
-  final EmbroideryDesign design;
-  final bool showJumpStitches;
+  final StitchRenderer renderer;
+  final StitchRenderStyle style;
   final bool showGrid;
-  final bool showStitchPoints;
-  final int? selectedColorIndex;
-  final int currentStitchStep;
+  final int limit;
+  final TransformationController transform;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
+    final b = renderer.design.bounds;
+    if (b.width <= 0 && b.height <= 0) return;
+    const pad = StitchCanvasWidget.fitPadding;
+    final fit = min(
+      (size.width - pad * 2) / max(b.width, 1),
+      (size.height - pad * 2) / max(b.height, 1),
+    );
+    final zoom = transform.value.getMaxScaleOnAxis();
+    final dpr = WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
 
-    if (design.stitches.isEmpty) return;
+    canvas.save();
+    canvas.translate(
+      (size.width - b.width * fit) / 2 - b.left * fit,
+      (size.height - b.height * fit) / 2 - b.top * fit,
+    );
+    canvas.scale(fit);
 
-    // 1. Calculate auto-center offset so design is centered on canvas
-    double minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
-    for (final p in design.stitches) {
-      minX = min(minX, p.x);
-      maxX = max(maxX, p.x);
-      minY = min(minY, p.y);
-      maxY = max(maxY, p.y);
+    if (showGrid) _drawGrid(canvas, b, fit * zoom);
+
+    renderer.paint(
+      canvas,
+      style: style,
+      pixelsPerMm: fit * zoom * dpr,
+      limit: limit,
+    );
+
+    final stitches = renderer.design.stitches;
+    if (limit > 0 && limit < stitches.length) {
+      _drawNeedle(canvas, stitches[limit - 1], fit * zoom);
     }
-    final midX = (minX + maxX) / 2.0;
-    final midY = (minY + maxY) / 2.0;
+    canvas.restore();
+  }
 
-    final stitchW = max((maxX - minX).abs(), 1.0);
-    final stitchH = max((maxY - minY).abs(), 1.0);
-    final scale = min((size.width * 0.90) / stitchW, (size.height * 0.90) / stitchH);
-
-    final centerShift = center - Offset(midX * scale, midY * scale);
-
-    // 2. Draw Grid Overlay
-    if (showGrid) {
-      _drawGrid(canvas, size, center);
+  /// 10 mm grid with a stronger line every 50 mm.
+  void _drawGrid(Canvas canvas, Rect b, double pxPerMm) {
+    final area = b.inflate(20);
+    final minor = Paint()
+      ..color = AppColors.border.withValues(alpha: 0.6)
+      ..strokeWidth = 1 / pxPerMm;
+    final major = Paint()
+      ..color = AppColors.secondary.withValues(alpha: 0.25)
+      ..strokeWidth = 1.5 / pxPerMm;
+    for (var x = (area.left / 10).floorToDouble() * 10; x <= area.right; x += 10) {
+      canvas.drawLine(Offset(x, area.top), Offset(x, area.bottom),
+          x.round() % 50 == 0 ? major : minor);
     }
-
-    // 3. Render Stitch Lines
-    final limit = min(currentStitchStep, design.stitches.length);
-
-    StitchPoint? prevPoint;
-
-    for (int i = 0; i < limit; i++) {
-      final p = design.stitches[i];
-      final currentOffset = centerShift + Offset(p.x * scale, p.y * scale);
-
-      if (prevPoint != null) {
-        final prevOffset =
-            centerShift + Offset(prevPoint.x * scale, prevPoint.y * scale);
-        final colorIndex = p.colorIndex % AppColors.defaultThreadPalette.length;
-        final color = AppColors.defaultThreadPalette[colorIndex];
-
-        final isColorSelected =
-            selectedColorIndex == null || selectedColorIndex == colorIndex;
-
-        final dxMm = (p.x - prevPoint.x).abs();
-        final dyMm = (p.y - prevPoint.y).abs();
-        final isTransit = p.type == StitchType.jump || dxMm > 12.1 || dyMm > 12.1;
-
-        if (isTransit) {
-          if (showJumpStitches && isColorSelected) {
-            _drawDashedLine(
-              canvas,
-              prevOffset,
-              currentOffset,
-              Paint()
-                ..color = AppColors.textMuted.withValues(alpha: 0.3)
-                ..strokeWidth = 0.8
-                ..style = PaintingStyle.stroke,
-            );
-          }
-        } else if (p.type == StitchType.normal) {
-          final threadPaint = Paint()
-            ..color = isColorSelected ? color : color.withValues(alpha: 0.12)
-            ..strokeWidth = isColorSelected ? 2.2 : 1.0
-            ..strokeCap = StrokeCap.round
-            ..strokeJoin = StrokeJoin.round
-            ..style = PaintingStyle.stroke;
-
-          canvas.drawLine(prevOffset, currentOffset, threadPaint);
-        }
-
-        if (showStitchPoints && isColorSelected) {
-          final dotPaint = Paint()
-            ..color = AppColors.textPrimary.withValues(alpha: 0.8)
-            ..style = PaintingStyle.fill;
-          canvas.drawCircle(currentOffset, 1.5, dotPaint);
-        }
-      }
-
-      prevPoint = p;
+    for (var y = (area.top / 10).floorToDouble() * 10; y <= area.bottom; y += 10) {
+      canvas.drawLine(Offset(area.left, y), Offset(area.right, y),
+          y.round() % 50 == 0 ? major : minor);
     }
   }
 
-  void _drawGrid(Canvas canvas, Size size, Offset center) {
-    final gridPaint = Paint()
-      ..color = AppColors.border.withValues(alpha: 0.25)
-      ..strokeWidth = 0.8;
-
-    final majorGridPaint = Paint()
-      ..color = AppColors.secondary.withValues(alpha: 0.2)
-      ..strokeWidth = 1.2;
-
-    const step = 20.0; // 20px grid lines
-
-    for (double x = 0; x < size.width; x += step) {
-      final isMajor = ((x - center.dx).abs() % (step * 5)) < 1;
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x, size.height),
-        isMajor ? majorGridPaint : gridPaint,
-      );
-    }
-
-    for (double y = 0; y < size.height; y += step) {
-      final isMajor = ((y - center.dy).abs() % (step * 5)) < 1;
-      canvas.drawLine(
-        Offset(0, y),
-        Offset(size.width, y),
-        isMajor ? majorGridPaint : gridPaint,
-      );
-    }
-  }
-
-  void _drawDashedLine(Canvas canvas, Offset p1, Offset p2, Paint paint) {
-    const dashWidth = 4.0;
-    const dashSpace = 4.0;
-    final distance = (p2 - p1).distance;
-    if (distance == 0) return;
-
-    final dx = (p2.dx - p1.dx) / distance;
-    final dy = (p2.dy - p1.dy) / distance;
-
-    double start = 0;
-    while (start < distance) {
-      final x1 = p1.dx + dx * start;
-      final y1 = p1.dy + dy * start;
-      final x2 = p1.dx + dx * min(start + dashWidth, distance);
-      final y2 = p1.dy + dy * min(start + dashWidth, distance);
-      canvas.drawLine(Offset(x1, y1), Offset(x2, y2), paint);
-      start += dashWidth + dashSpace;
-    }
+  /// Crosshair at the current needle position during playback.
+  void _drawNeedle(Canvas canvas, StitchPoint p, double pxPerMm) {
+    final r = 9 / pxPerMm;
+    final paint = Paint()
+      ..color = AppColors.red
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2 / pxPerMm;
+    final c = Offset(p.x, p.y);
+    canvas.drawCircle(c, r, paint);
+    canvas.drawLine(c - Offset(r * 1.6, 0), c + Offset(r * 1.6, 0), paint);
+    canvas.drawLine(c - Offset(0, r * 1.6), c + Offset(0, r * 1.6), paint);
   }
 
   @override
-  bool shouldRepaint(covariant _EmbroideryStitchPainter oldDelegate) {
-    return oldDelegate.design != design ||
-        oldDelegate.showJumpStitches != showJumpStitches ||
-        oldDelegate.showGrid != showGrid ||
-        oldDelegate.showStitchPoints != showStitchPoints ||
-        oldDelegate.selectedColorIndex != selectedColorIndex ||
-        oldDelegate.currentStitchStep != currentStitchStep;
-  }
+  bool shouldRepaint(covariant _StitchPainter old) =>
+      old.renderer != renderer ||
+      old.style != style ||
+      old.showGrid != showGrid ||
+      old.limit != limit;
 }

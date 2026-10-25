@@ -29,6 +29,7 @@ void registerRepositories(GetIt getIt) {
   getIt.registerLazySingleton<ViewerRepository>(
     () => ViewerRepositoryImpl(
       stitchParserService: getIt<StitchParserService>(),
+      threadColorStore: getIt<ThreadColorStore>(),
     ),
   );
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
 
+/// Play/pause, scrub slider (with step counter underneath) and speed menu.
+/// Compact enough to sit beside the view toggles on a 360 px wide phone.
 class StitchPlaybackControlsWidget extends StatelessWidget {
   const StitchPlaybackControlsWidget({
     super.key,
@@ -21,103 +23,86 @@ class StitchPlaybackControlsWidget extends StatelessWidget {
   final ValueChanged<int> onStepChanged;
   final ValueChanged<double> onSpeedChanged;
 
-  static const List<double> speeds = [1.0, 2.0, 5.0, 10.0];
+  static const List<double> speeds = [1, 2, 5, 10, 25, 50];
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppSize.size16, vertical: AppSize.size8),
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.98),
-        border: const Border(top: BorderSide(color: AppColors.border)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.04),
-            blurRadius: AppSize.size12,
-            offset: const Offset(0, -2),
+    final max = totalStitches > 0 ? totalStitches.toDouble() : 1.0;
+    return Row(
+      children: [
+        IconButton(
+          onPressed: onPlayToggle,
+          tooltip: isPlaying ? 'Pause' : 'Play stitch by stitch',
+          icon: Icon(
+            isPlaying
+                ? Icons.pause_circle_filled_rounded
+                : Icons.play_circle_fill_rounded,
+            color: AppColors.primary,
+            size: AppSize.size36,
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
+        ),
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                onPressed: onPlayToggle,
-                icon: Icon(
-                  isPlaying
-                      ? Icons.pause_circle_filled_rounded
-                      : Icons.play_circle_fill_rounded,
-                  color: AppColors.primary,
-                  size: AppSize.size36,
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: AppColors.primary,
+                  inactiveTrackColor: AppColors.border,
+                  thumbColor: AppColors.primary,
+                  overlayColor: AppColors.primary.withValues(alpha: 0.15),
+                  trackHeight: AppSize.size4,
+                  overlayShape:
+                      const RoundSliderOverlayShape(overlayRadius: AppSize.size14),
+                ),
+                child: Slider(
+                  value: currentStep.toDouble().clamp(0, max),
+                  max: max,
+                  onChanged: (v) => onStepChanged(v.round()),
                 ),
               ),
-              AppGaps.gap8,
-              Expanded(
-                child: SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: AppColors.primary,
-                    inactiveTrackColor: AppColors.border,
-                    thumbColor: AppColors.primary,
-                    overlayColor: AppColors.primary.withValues(alpha: 0.15),
-                    trackHeight: AppSize.size4,
-                  ),
-                  child: Slider(
-                    value: currentStep
-                        .toDouble()
-                        .clamp(0, totalStitches.toDouble()),
-                    min: 0,
-                    max: totalStitches.toDouble() > 0
-                        ? totalStitches.toDouble()
-                        : 1.0,
-                    onChanged: (val) => onStepChanged(val.toInt()),
-                  ),
-                ),
-              ),
-              AppGaps.gap8,
               Text(
                 '$currentStep / $totalStitches',
                 style: AppTextStyles.caption.copyWith(
                   color: AppColors.textSecondary,
-                  fontWeight: FontWeight.bold,
+                  fontSize: AppFontSize.fontSize10,
                 ),
-              ),
-              AppGaps.gap12,
-              // Speed Multiplier Dropdown / Toggle
-              PopupMenuButton<double>(
-                initialValue: speed,
-                onSelected: onSpeedChanged,
-                color: AppColors.surface,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSize.size8, vertical: AppSize.size4),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: AppBorderRadius.borderRadius8,
-                    border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.2)),
-                  ),
-                  child: Text(
-                    '${speed.toStringAsFixed(0)}x',
-                    style: AppTextStyles.caption.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                itemBuilder: (_) => speeds.map((s) {
-                  return PopupMenuItem<double>(
-                    value: s,
-                    child: Text('${s.toStringAsFixed(0)}x Speed'),
-                  );
-                }).toList(),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        PopupMenuButton<double>(
+          initialValue: speed,
+          onSelected: onSpeedChanged,
+          color: AppColors.surface,
+          tooltip: 'Playback speed',
+          itemBuilder: (_) => [
+            for (final s in speeds)
+              PopupMenuItem<double>(
+                value: s,
+                child: Text('${s.toStringAsFixed(0)}× speed'),
+              ),
+          ],
+          child: Container(
+            margin: const EdgeInsets.only(right: AppSize.size12),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.size8, vertical: AppSize.size4),
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: AppBorderRadius.borderRadius8,
+              border:
+                  Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+            ),
+            child: Text(
+              '${speed.toStringAsFixed(0)}×',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

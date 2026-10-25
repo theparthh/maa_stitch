@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:maa_design_stitch_viewer/app/core/core.dart';
 import 'package:maa_design_stitch_viewer/app/router/app_route_handler.dart';
 import 'package:maa_design_stitch_viewer/app/router/app_router.dart';
@@ -13,6 +16,9 @@ class HomeViewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeBloc, HomeState>(
+      listenWhen: (prev, next) =>
+          next is HomeLoaded &&
+          next.openRequest != (prev is HomeLoaded ? prev.openRequest : 0),
       listener: (context, state) {
         if (state is HomeLoaded && state.openedFilePath != null) {
           AppRouteHandler.route
@@ -188,10 +194,16 @@ class HomeViewWidget extends StatelessWidget {
 class _ReferenceFilesCard extends StatelessWidget {
   const _ReferenceFilesCard();
 
-  /// Base directory — the project/app root where reference folders live.
-  /// Stored in one place; no folder names are referenced here.
-  static const String _baseDir =
+  /// Project folder used when running on the development Mac.
+  static const String _devBaseDir =
       '/Users/theparth/Desktop/maa_design_stitch_viewer';
+
+  /// On phones the project folder does not exist, so browse the app's
+  /// documents folder instead.
+  static Future<String> _resolveBaseDir() async {
+    if (await Directory(_devBaseDir).exists()) return _devBaseDir;
+    return (await getApplicationDocumentsDirectory()).path;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -212,10 +224,11 @@ class _ReferenceFilesCard extends StatelessWidget {
         color: AppColors.transparent,
         borderRadius: AppBorderRadius.borderRadius20,
         child: InkWell(
-          onTap: () {
+          onTap: () async {
+            final baseDir = await _resolveBaseDir();
             AppRouteHandler.route.push(
               FolderBrowserRoute(
-                baseDirectoryPath: _baseDir,
+                baseDirectoryPath: baseDir,
                 title: 'Reference Files',
               ),
             );

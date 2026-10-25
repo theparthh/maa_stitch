@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maa_design_stitch_viewer/app/models/models.dart';
+import 'package:maa_design_stitch_viewer/app/services/services.dart';
 import 'package:maa_design_stitch_viewer/features/viewer/viewer.dart';
 
 part 'viewer_event.dart';
@@ -11,8 +13,9 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
     on<LoadViewerEvent>(_onLoad);
     on<ToggleJumpStitchesEvent>(_onToggleJumpStitches);
     on<ToggleGridEvent>(_onToggleGrid);
-    on<ToggleStitchPointsEvent>(_onToggleStitchPoints);
     on<SelectThreadColorEvent>(_onSelectThreadColor);
+    on<UpdateThreadEvent>(_onUpdateThread);
+    on<ResetThreadColorsEvent>(_onResetThreadColors);
     on<SetPlaybackSpeedEvent>(_onSetPlaybackSpeed);
     on<TogglePlaybackEvent>(_onTogglePlayback);
     on<UpdatePlaybackStepEvent>(_onUpdatePlaybackStep);
@@ -20,25 +23,31 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
 
   final ViewerRepository repository;
 
+  /// Thread entries as decoded, before the user's saved colours.
+  List<ThreadBlock> _fileThreads = const [];
+
   Future<void> _onLoad(
     LoadViewerEvent event,
     Emitter<ViewerState> emit,
   ) async {
     emit(const ViewerLoading());
     try {
-      final design = await repository.parseDesignFile(event.filePath);
+      final decoded = await repository.parseDesignFile(event.filePath);
+      _fileThreads = decoded.threads;
+      final design = repository.applySavedThreadColors(decoded);
       emit(ViewerLoaded(
         design: design,
-        showJumpStitches: true,
-        showGrid: true,
-        showStitchPoints: false,
-        selectedColorIndex: null,
+        showJumpStitches: false,
+        showGrid: false,
+        selectedColorKey: null,
         isPlaying: false,
         playbackSpeed: 1.0,
-        currentStitchStep: design.totalStitches,
+        currentStitchStep: design.stitches.length,
       ));
+    } on EmbroideryDecodeException catch (e) {
+      emit(ViewerError(e.message));
     } catch (e) {
-      emit(ViewerError(e.toString()));
+      emit(ViewerError('Could not open this file: $e'));
     }
   }
 
@@ -46,29 +55,14 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
     ToggleJumpStitchesEvent event,
     Emitter<ViewerState> emit,
   ) {
-    if (state is ViewerLoaded) {
-      final current = state as ViewerLoaded;
-      emit(current.copyWith(showJumpStitches: !current.showJumpStitches));
+    if (state case final ViewerLoaded s) {
+      emit(s.copyWith(showJumpStitches: !s.showJumpStitches));
     }
   }
 
-  void _onToggleGrid(
-    ToggleGridEvent event,
-    Emitter<ViewerState> emit,
-  ) {
-    if (state is ViewerLoaded) {
-      final current = state as ViewerLoaded;
-      emit(current.copyWith(showGrid: !current.showGrid));
-    }
-  }
-
-  void _onToggleStitchPoints(
-    ToggleStitchPointsEvent event,
-    Emitter<ViewerState> emit,
-  ) {
-    if (state is ViewerLoaded) {
-      final current = state as ViewerLoaded;
-      emit(current.copyWith(showStitchPoints: !current.showStitchPoints));
+  void _onToggleGrid(ToggleGridEvent event, Emitter<ViewerState> emit) {
+    if (state case final ViewerLoaded s) {
+      emit(s.copyWith(showGrid: !s.showGrid));
     }
   }
 
@@ -76,14 +70,36 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
     SelectThreadColorEvent event,
     Emitter<ViewerState> emit,
   ) {
-    if (state is ViewerLoaded) {
-      final current = state as ViewerLoaded;
-      if (event.colorIndex == null ||
-          current.selectedColorIndex == event.colorIndex) {
-        emit(current.copyWith(selectedColorIndexProvider: () => false));
-      } else {
-        emit(current.copyWith(selectedColorIndex: event.colorIndex));
-      }
+    if (state case final ViewerLoaded s) {
+      final next = s.selectedColorKey == event.colorKey ? null : event.colorKey;
+      emit(s.copyWith(selectedColorKey: () => next));
+    }
+  }
+
+  Future<void> _onUpdateThread(
+    UpdateThreadEvent event,
+    Emitter<ViewerState> emit,
+  ) async {
+    if (state case final ViewerLoaded s) {
+      final design = s.design.copyWith(threads: [
+        for (final t in s.design.threads)
+          t.colorKey == event.colorKey
+              ? t.copyWith(color: event.color, style: event.style)
+              : t,
+      ]);
+      emit(s.copyWith(design: design));
+      await repository.saveThreadColors(design);
+    }
+  }
+
+  Future<void> _onResetThreadColors(
+    ResetThreadColorsEvent event,
+    Emitter<ViewerState> emit,
+  ) async {
+    if (state case final ViewerLoaded s) {
+      final design = s.design.copyWith(threads: _fileThreads);
+      emit(s.copyWith(design: design));
+      await repository.clearThreadColors(design);
     }
   }
 
@@ -91,9 +107,8 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
     SetPlaybackSpeedEvent event,
     Emitter<ViewerState> emit,
   ) {
-    if (state is ViewerLoaded) {
-      final current = state as ViewerLoaded;
-      emit(current.copyWith(playbackSpeed: event.speed));
+    if (state case final ViewerLoaded s) {
+      emit(s.copyWith(playbackSpeed: event.speed));
     }
   }
 
@@ -101,16 +116,12 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
     TogglePlaybackEvent event,
     Emitter<ViewerState> emit,
   ) {
-    if (state is ViewerLoaded) {
-      final current = state as ViewerLoaded;
-      final newIsPlaying = !current.isPlaying;
-      int nextStep = current.currentStitchStep;
-      if (newIsPlaying &&
-          current.currentStitchStep >= current.design.totalStitches) {
-        nextStep = 0;
-      }
-      emit(current.copyWith(
-          isPlaying: newIsPlaying, currentStitchStep: nextStep));
+    if (state case final ViewerLoaded s) {
+      final playing = !s.isPlaying;
+      emit(s.copyWith(
+        isPlaying: playing,
+        currentStitchStep: playing && s.isComplete ? 0 : s.currentStitchStep,
+      ));
     }
   }
 
@@ -118,9 +129,13 @@ class ViewerBloc extends Bloc<ViewerEvent, ViewerState> {
     UpdatePlaybackStepEvent event,
     Emitter<ViewerState> emit,
   ) {
-    if (state is ViewerLoaded) {
-      final current = state as ViewerLoaded;
-      emit(current.copyWith(currentStitchStep: event.step));
+    if (state case final ViewerLoaded s) {
+      final total = s.design.stitches.length;
+      final step = event.step.clamp(0, total);
+      emit(s.copyWith(
+        currentStitchStep: step,
+        isPlaying: s.isPlaying && step < total,
+      ));
     }
   }
 }

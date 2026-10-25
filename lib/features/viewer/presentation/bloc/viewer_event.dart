@@ -24,17 +24,30 @@ final class ToggleGridEvent extends ViewerEvent {
   const ToggleGridEvent();
 }
 
-final class ToggleStitchPointsEvent extends ViewerEvent {
-  const ToggleStitchPointsEvent();
-}
-
+/// Highlights one colour entry (by [ThreadBlock.colorKey]); null shows all.
 final class SelectThreadColorEvent extends ViewerEvent {
-  const SelectThreadColorEvent(this.colorIndex);
+  const SelectThreadColorEvent(this.colorKey);
 
-  final int? colorIndex; // null means show all colors
+  final int? colorKey;
 
   @override
-  List<Object?> get props => [colorIndex];
+  List<Object?> get props => [colorKey];
+}
+
+/// Changes the colour and/or style of every entry with [colorKey].
+final class UpdateThreadEvent extends ViewerEvent {
+  const UpdateThreadEvent({required this.colorKey, this.color, this.style});
+
+  final int colorKey;
+  final Color? color;
+  final ThreadStyle? style;
+
+  @override
+  List<Object?> get props => [colorKey, color, style];
+}
+
+final class ResetThreadColorsEvent extends ViewerEvent {
+  const ResetThreadColorsEvent();
 }
 
 final class SetPlaybackSpeedEvent extends ViewerEvent {

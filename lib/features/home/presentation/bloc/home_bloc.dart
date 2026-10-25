@@ -78,28 +78,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     PickFileHomeEvent event,
     Emitter<HomeState> emit,
   ) async {
-    if (state is HomeLoaded) {
-      final current = state as HomeLoaded;
-      try {
-        final path = await repository.pickEmbroideryFile();
-        if (path != null) {
-          final newDesign = await repository.parseDesignFile(path);
-          final updatedList = [newDesign, ...current.allDesigns];
-          final filtered = _applyFilterAndSearch(
-            updatedList,
-            current.activeFilter,
-            current.searchQuery,
-          );
-
-          emit(current.copyWith(
-            allDesigns: updatedList,
-            filteredDesigns: filtered,
-            openedFilePath: path,
-          ));
-        }
-      } catch (e) {
-        emit(HomeError('Failed to open file: $e'));
-      }
+    if (state case final HomeLoaded current) {
+      final path = await repository.pickEmbroideryFile();
+      if (path == null) return;
+      // The viewer decodes the file and shows any error itself.
+      emit(current.copyWith(
+        openedFilePath: path,
+        openRequest: current.openRequest + 1,
+      ));
     }
   }
 

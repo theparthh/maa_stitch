@@ -8,4 +8,7 @@ void registerServices(GetIt getIt) {
   );
   getIt.registerLazySingleton<StitchParserService>(() => StitchParserService());
   getIt.registerLazySingleton<FileHandlerService>(() => FileHandlerService());
+  getIt.registerLazySingleton<ThreadColorStore>(
+    () => ThreadColorStore(getIt<SharedPreferences>()),
+  );
 }

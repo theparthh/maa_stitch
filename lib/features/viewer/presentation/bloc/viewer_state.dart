@@ -20,8 +20,7 @@ final class ViewerLoaded extends ViewerState {
     required this.design,
     required this.showJumpStitches,
     required this.showGrid,
-    required this.showStitchPoints,
-    required this.selectedColorIndex,
+    required this.selectedColorKey,
     required this.isPlaying,
     required this.playbackSpeed,
     required this.currentStitchStep,
@@ -30,19 +29,21 @@ final class ViewerLoaded extends ViewerState {
   final EmbroideryDesign design;
   final bool showJumpStitches;
   final bool showGrid;
-  final bool showStitchPoints;
-  final int? selectedColorIndex;
+  final int? selectedColorKey;
   final bool isPlaying;
   final double playbackSpeed;
+
+  /// Number of needle positions drawn (== stitches.length when complete).
   final int currentStitchStep;
+
+  bool get isComplete => currentStitchStep >= design.stitches.length;
 
   @override
   List<Object?> get props => [
         design,
         showJumpStitches,
         showGrid,
-        showStitchPoints,
-        selectedColorIndex,
+        selectedColorKey,
         isPlaying,
         playbackSpeed,
         currentStitchStep,
@@ -52,9 +53,7 @@ final class ViewerLoaded extends ViewerState {
     EmbroideryDesign? design,
     bool? showJumpStitches,
     bool? showGrid,
-    bool? showStitchPoints,
-    int? selectedColorIndex,
-    bool Function()? selectedColorIndexProvider,
+    int? Function()? selectedColorKey,
     bool? isPlaying,
     double? playbackSpeed,
     int? currentStitchStep,
@@ -63,10 +62,8 @@ final class ViewerLoaded extends ViewerState {
       design: design ?? this.design,
       showJumpStitches: showJumpStitches ?? this.showJumpStitches,
       showGrid: showGrid ?? this.showGrid,
-      showStitchPoints: showStitchPoints ?? this.showStitchPoints,
-      selectedColorIndex: selectedColorIndexProvider != null
-          ? (selectedColorIndexProvider() ? selectedColorIndex : null)
-          : (selectedColorIndex ?? this.selectedColorIndex),
+      selectedColorKey:
+          selectedColorKey != null ? selectedColorKey() : this.selectedColorKey,
       isPlaying: isPlaying ?? this.isPlaying,
       playbackSpeed: playbackSpeed ?? this.playbackSpeed,
       currentStitchStep: currentStitchStep ?? this.currentStitchStep,

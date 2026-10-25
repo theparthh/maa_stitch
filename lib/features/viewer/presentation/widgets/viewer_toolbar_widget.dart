@@ -7,10 +7,12 @@ class ViewerToolbarWidget extends StatelessWidget {
     super.key,
     required this.design,
     required this.onBackTap,
+    this.actions = const [],
   });
 
   final EmbroideryDesign design;
   final VoidCallback onBackTap;
+  final List<Widget> actions;
 
   @override
   Widget build(BuildContext context) {
@@ -74,10 +76,16 @@ class ViewerToolbarWidget extends StatelessWidget {
                         ),
                       ),
                       AppGaps.gap8,
-                      Text(
-                        '${design.totalStitches} Stitches',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
+                      Flexible(
+                        child: Text(
+                          '${design.totalStitches} stitches · '
+                          '${design.widthMm.toStringAsFixed(0)}×'
+                          '${design.heightMm.toStringAsFixed(0)} mm',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
                     ],
@@ -85,6 +93,7 @@ class ViewerToolbarWidget extends StatelessWidget {
                 ],
               ),
             ),
+            ...actions,
           ],
         ),
       ),

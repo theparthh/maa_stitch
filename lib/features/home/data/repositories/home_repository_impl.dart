@@ -13,7 +13,8 @@ class HomeRepositoryImpl implements HomeRepository {
 
   @override
   Future<List<EmbroideryDesign>> getSampleAndRecentDesigns() async {
-    return stitchParserService.getSampleDesigns();
+    // No bundled samples: every design shown comes from a real file.
+    return const [];
   }
 
   @override
